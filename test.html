@@ -1,0 +1,915 @@
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: var(--font-sans);
+  }
+
+  .phone-frame {
+    width: 340px;
+    min-height: 680px;
+    background: #0a0a0f;
+    border-radius: 36px;
+    border: 1.5px solid #2a2a3a;
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto;
+  }
+
+  .screen {
+    width: 100%;
+    min-height: 680px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .notch {
+    width: 100px;
+    height: 28px;
+    background: #0a0a0f;
+    border-radius: 0 0 18px 18px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    padding: 0 8px;
+    margin: 8px 0 0;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .tab {
+    flex: 1;
+    padding: 8px 0;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-weight: 400;
+  }
+  .tab.active {
+    color: #fff;
+    border-bottom: 2px solid #9b7cf4;
+  }
+
+  .page {
+    display: none;
+  }
+  .page.active {
+    display: block;
+  }
+
+  /* --- HOME PAGE --- */
+  .home-header {
+    padding: 12px 18px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    font-size: 15px;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: 0.3px;
+  }
+  .logo span {
+    color: #9b7cf4;
+  }
+  .avatar-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #9b7cf4, #f472b6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .create-banner {
+    margin: 10px 16px 14px;
+    background: #14121f;
+    border: 0.5px solid rgba(155, 124, 244, 0.25);
+    border-radius: 18px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .create-banner::before {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(155, 124, 244, 0.18) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .banner-tag {
+    display: inline-block;
+    background: rgba(155, 124, 244, 0.15);
+    color: #9b7cf4;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    border: 0.5px solid rgba(155, 124, 244, 0.3);
+  }
+  .banner-title {
+    font-size: 17px;
+    font-weight: 500;
+    color: #fff;
+    line-height: 1.35;
+    margin-bottom: 12px;
+  }
+  .banner-title em {
+    color: #9b7cf4;
+    font-style: normal;
+  }
+  .btn-create {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #9b7cf4;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-create i {
+    font-size: 16px;
+  }
+
+  .section-label {
+    padding: 0 18px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+
+  .mood-scroll {
+    display: flex;
+    gap: 8px;
+    padding: 0 18px 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .mood-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mood-chip {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+    background: #14121f;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mood-chip.selected {
+    background: #9b7cf4;
+    color: #fff;
+    border-color: #9b7cf4;
+  }
+  .mood-chip:hover {
+    opacity: 0.8;
+  }
+
+  .recent-label {
+    padding: 0 18px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .story-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 0 16px 16px;
+  }
+  .story-card {
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 9/16;
+    background: #1a1828;
+    cursor: pointer;
+  }
+  .story-card-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+  }
+  .story-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
+    padding: 10px 8px 8px;
+  }
+  .story-mood-badge {
+    font-size: 9px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 3px;
+  }
+  .story-time {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  /* --- CREATE PAGE --- */
+  .create-page {
+    padding: 14px 16px;
+  }
+  .create-page h2 {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .create-page p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 16px;
+  }
+
+  .upload-zone {
+    border: 1px dashed rgba(155, 124, 244, 0.35);
+    border-radius: 16px;
+    padding: 28px 16px;
+    text-align: center;
+    margin-bottom: 16px;
+    background: #14121f;
+    cursor: pointer;
+  }
+  .upload-icon {
+    font-size: 28px;
+    color: #9b7cf4;
+    margin-bottom: 8px;
+  }
+  .upload-zone p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 4px;
+  }
+  .upload-zone small {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.25);
+  }
+
+  .uploaded-preview {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .preview-thumb {
+    flex-shrink: 0;
+    width: 64px;
+    height: 84px;
+    border-radius: 10px;
+    background: #1a1828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .preview-thumb .remove-btn {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 16px;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #fff;
+    cursor: pointer;
+  }
+  .add-more-thumb {
+    flex-shrink: 0;
+    width: 64px;
+    height: 84px;
+    border-radius: 10px;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    gap: 4px;
+  }
+  .add-more-thumb span {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.25);
+  }
+
+  .step-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 10px;
+  }
+
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .mood-option {
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    background: #14121f;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mood-option.active {
+    border-color: rgba(155, 124, 244, 0.5);
+    background: rgba(155, 124, 244, 0.1);
+  }
+  .mood-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .mood-option-name {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+  }
+  .mood-option.active .mood-option-name {
+    color: #fff;
+  }
+
+  .generate-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #9b7cf4, #f472b6);
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .generate-btn i {
+    font-size: 18px;
+  }
+
+  /* --- PREVIEW/EXPORT PAGE --- */
+  .preview-page {
+    padding: 14px 16px;
+  }
+  .preview-phone-mock {
+    background: #0d0b18;
+    border-radius: 20px;
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    aspect-ratio: 9/16;
+    max-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .preview-bg-blur {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    opacity: 0.12;
+  }
+  .preview-content {
+    position: relative;
+    text-align: center;
+  }
+  .preview-emoji {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+  .preview-text {
+    font-size: 15px;
+    color: #fff;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .preview-caption {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 6px;
+    font-style: italic;
+  }
+  .preview-mood-pill {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(155, 124, 244, 0.25);
+    border: 0.5px solid rgba(155, 124, 244, 0.4);
+    color: #c4a8ff;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .export-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .export-card {
+    background: #14121f;
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .export-card.selected {
+    border-color: rgba(155, 124, 244, 0.4);
+    background: rgba(155, 124, 244, 0.08);
+  }
+  .export-card i {
+    font-size: 20px;
+    color: #9b7cf4;
+    margin-bottom: 5px;
+  }
+  .export-card-name {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+  }
+  .export-card-size {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-top: 2px;
+  }
+
+  .music-row {
+    background: #14121f;
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    cursor: pointer;
+  }
+  .music-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(155, 124, 244, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .music-info {
+    flex: 1;
+  }
+  .music-name {
+    font-size: 12px;
+    color: #fff;
+    font-weight: 500;
+  }
+  .music-vibe {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.35);
+  }
+  .music-play {
+    color: #9b7cf4;
+    font-size: 20px;
+  }
+
+  .export-btn {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #9b7cf4, #f472b6);
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .export-btn i {
+    font-size: 18px;
+  }
+
+  /* generating animation */
+  .generating-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 15, 0.92);
+    z-index: 20;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .generating-overlay.show {
+    display: flex;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(155, 124, 244, 0.2);
+    border-top-color: #9b7cf4;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .gen-text {
+    font-size: 14px;
+    color: #fff;
+    font-weight: 500;
+  }
+  .gen-sub {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .gen-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 200px;
+  }
+  .gen-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .gen-step.done {
+    color: #7ed9a8;
+  }
+  .gen-step.active {
+    color: #fff;
+  }
+  .gen-step.pending {
+    color: rgba(255, 255, 255, 0.25);
+  }
+  .gen-step i {
+    font-size: 14px;
+  }
+</style>
+
+<h2 class="sr-only">Mood Story AI — mobile app UI prototype with Home, Create, and Preview screens</h2>
+
+<div style="padding: 16px 0; background: transparent">
+  <div class="phone-frame">
+    <div class="screen">
+      <div class="notch"></div>
+
+      <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('home', this)">Home</div>
+        <div class="tab" onclick="switchTab('create', this)">Create</div>
+        <div class="tab" onclick="switchTab('preview', this)">Preview</div>
+      </div>
+
+      <!-- HOME PAGE -->
+      <div class="page active" id="tab-home">
+        <div class="home-header">
+          <div class="logo">Mood<span>Story</span></div>
+          <div class="avatar-btn">K</div>
+        </div>
+
+        <div class="create-banner">
+          <div class="banner-tag">✦ AI-powered</div>
+          <div class="banner-title">Create your<br /><em>aesthetic story</em><br />in 30 seconds</div>
+          <button class="btn-create" onclick="switchTab('create', document.querySelectorAll('.tab')[1])">
+            <i class="ti ti-sparkles" aria-hidden="true"></i>
+            New Story
+          </button>
+        </div>
+
+        <div class="section-label">Pick a mood</div>
+        <div class="mood-scroll">
+          <div class="mood-chip selected" onclick="selectMoodChip(this)">🌙 Night Drive</div>
+          <div class="mood-chip" onclick="selectMoodChip(this)">☁️ Chill</div>
+          <div class="mood-chip" onclick="selectMoodChip(this)">💻 Coding</div>
+          <div class="mood-chip" onclick="selectMoodChip(this)">✈️ Travel</div>
+          <div class="mood-chip" onclick="selectMoodChip(this)">🎬 Cinematic</div>
+          <div class="mood-chip" onclick="selectMoodChip(this)">🌆 Neon</div>
+        </div>
+
+        <div class="recent-label">Recent stories</div>
+        <div class="story-grid">
+          <div class="story-card">
+            <div class="story-card-bg" style="background: linear-gradient(160deg, #1a0f3d, #0d1b4a)">🌙</div>
+            <div class="story-card-overlay">
+              <div class="story-mood-badge">Night Drive</div>
+              <div class="story-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="story-card">
+            <div class="story-card-bg" style="background: linear-gradient(160deg, #0f2a1a, #1a3a0f)">🌿</div>
+            <div class="story-card-overlay">
+              <div class="story-mood-badge">Chill</div>
+              <div class="story-time">Yesterday</div>
+            </div>
+          </div>
+          <div class="story-card">
+            <div class="story-card-bg" style="background: linear-gradient(160deg, #2a0f1a, #3d1030)">🌸</div>
+            <div class="story-card-overlay">
+              <div class="story-mood-badge">Memories</div>
+              <div class="story-time">3 days ago</div>
+            </div>
+          </div>
+          <div class="story-card" style="display: flex; align-items: center; justify-content: center; background: #0d0b18; border: 1px dashed rgba(255, 255, 255, 0.08)">
+            <div style="text-align: center">
+              <i class="ti ti-plus" style="font-size: 22px; color: rgba(255, 255, 255, 0.2)" aria-hidden="true"></i>
+              <div style="font-size: 10px; color: rgba(255, 255, 255, 0.2); margin-top: 4px">New</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CREATE PAGE -->
+      <div class="page" id="tab-create">
+        <div class="create-page">
+          <h2>New story</h2>
+          <p>Upload photos or videos, pick your vibe</p>
+
+          <div class="uploaded-preview" id="preview-row" style="display: none">
+            <div class="preview-thumb">
+              🌃
+              <div class="remove-btn" onclick="removePreview(this.parentNode)">×</div>
+            </div>
+            <div class="preview-thumb">
+              🌉
+              <div class="remove-btn" onclick="removePreview(this.parentNode)">×</div>
+            </div>
+            <div class="add-more-thumb" onclick="addThumb()">
+              <i class="ti ti-plus" aria-hidden="true"></i>
+              <span>Add</span>
+            </div>
+          </div>
+
+          <div class="upload-zone" id="upload-zone" onclick="showUpload()">
+            <div class="upload-icon"><i class="ti ti-photo-up" aria-hidden="true"></i></div>
+            <p>Tap to upload photos & videos</p>
+            <small>JPG, PNG, MP4 • Max 50MB</small>
+          </div>
+
+          <div class="step-label">Choose a mood</div>
+          <div class="mood-grid">
+            <div class="mood-option active" onclick="selectMood(this)">
+              <div class="mood-dot" style="background: rgba(30, 20, 80, 0.8)">🌙</div>
+              <div class="mood-option-name">Night Drive</div>
+            </div>
+            <div class="mood-option" onclick="selectMood(this)">
+              <div class="mood-dot" style="background: rgba(20, 50, 30, 0.8)">☁️</div>
+              <div class="mood-option-name">Chill</div>
+            </div>
+            <div class="mood-option" onclick="selectMood(this)">
+              <div class="mood-dot" style="background: rgba(60, 20, 50, 0.8)">💔</div>
+              <div class="mood-option-name">Sad</div>
+            </div>
+            <div class="mood-option" onclick="selectMood(this)">
+              <div class="mood-dot" style="background: rgba(20, 40, 60, 0.8)">💻</div>
+              <div class="mood-option-name">Coding</div>
+            </div>
+            <div class="mood-option" onclick="selectMood(this)">
+              <div class="mood-dot" style="background: rgba(60, 30, 10, 0.8)">🎬</div>
+              <div class="mood-option-name">Cinematic</div>
+            </div>
+            <div class="mood-option" onclick="selectMood(this)">
+              <div class="mood-dot" style="background: rgba(50, 10, 60, 0.8)">🌆</div>
+              <div class="mood-option-name">Neon</div>
+            </div>
+          </div>
+
+          <button class="generate-btn" onclick="startGenerate()">
+            <i class="ti ti-sparkles" aria-hidden="true"></i>
+            Generate story
+          </button>
+        </div>
+      </div>
+
+      <!-- PREVIEW PAGE -->
+      <div class="page" id="tab-preview">
+        <div class="preview-page">
+          <div class="preview-phone-mock">
+            <div class="preview-bg-blur">🌙</div>
+            <div class="preview-mood-pill">🌙 Night Drive</div>
+            <div class="preview-content">
+              <div class="preview-emoji">🌃</div>
+              <div class="preview-text">Lost in the city lights<br />and lo-fi beats</div>
+              <div class="preview-caption">AI generated caption ✦</div>
+            </div>
+          </div>
+
+          <div style="font-size: 12px; color: rgba(255, 255, 255, 0.35); margin-bottom: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.7px">Export for</div>
+          <div class="export-options">
+            <div class="export-card selected" onclick="selectExport(this)">
+              <i class="ti ti-brand-instagram" aria-hidden="true"></i>
+              <div class="export-card-name">Instagram</div>
+              <div class="export-card-size">9:16 · 1080p</div>
+            </div>
+            <div class="export-card" onclick="selectExport(this)">
+              <i class="ti ti-brand-tiktok" aria-hidden="true"></i>
+              <div class="export-card-name">TikTok</div>
+              <div class="export-card-size">9:16 · 1080p</div>
+            </div>
+            <div class="export-card" onclick="selectExport(this)">
+              <i class="ti ti-brand-facebook" aria-hidden="true"></i>
+              <div class="export-card-name">Facebook</div>
+              <div class="export-card-size">9:16 · Story</div>
+            </div>
+            <div class="export-card" onclick="selectExport(this)">
+              <i class="ti ti-download" aria-hidden="true"></i>
+              <div class="export-card-name">Save MP4</div>
+              <div class="export-card-size">Full quality</div>
+            </div>
+          </div>
+
+          <div style="font-size: 12px; color: rgba(255, 255, 255, 0.35); margin-bottom: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.7px">AI suggested music</div>
+          <div class="music-row">
+            <div class="music-thumb">🎵</div>
+            <div class="music-info">
+              <div class="music-name">Midnight Drive Lofi</div>
+              <div class="music-vibe">Calm · 92 BPM · matches your mood</div>
+            </div>
+            <i class="ti ti-player-play music-play" aria-hidden="true"></i>
+          </div>
+
+          <button class="export-btn">
+            <i class="ti ti-download" aria-hidden="true"></i>
+            Export story
+          </button>
+        </div>
+      </div>
+
+      <!-- Generating Overlay -->
+      <div class="generating-overlay" id="gen-overlay">
+        <div class="spinner"></div>
+        <div class="gen-text">Creating your story...</div>
+        <div class="gen-steps" id="gen-steps">
+          <div class="gen-step done" id="gs1"><i class="ti ti-check" aria-hidden="true"></i> Analyzing photos</div>
+          <div class="gen-step active" id="gs2"><i class="ti ti-loader" aria-hidden="true"></i> Applying Night Drive mood</div>
+          <div class="gen-step pending" id="gs3"><i class="ti ti-music" aria-hidden="true"></i> Syncing music</div>
+          <div class="gen-step pending" id="gs4"><i class="ti ti-text-caption" aria-hidden="true"></i> Generating caption</div>
+        </div>
+        <div class="gen-sub">AI magic in progress ✦</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 12px; font-size: 11px; color: rgba(var(--color-text-secondary, 150, 150, 150), 0.6)">Tap tabs to explore screens · Interactive prototype</div>
+</div>
+
+<script>
+  function switchTab(id, el) {
+    document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+    document.getElementById("tab-" + id).classList.add("active");
+    el.classList.add("active");
+  }
+
+  function selectMoodChip(el) {
+    document.querySelectorAll(".mood-chip").forEach((c) => c.classList.remove("selected"));
+    el.classList.add("selected");
+  }
+
+  function selectMood(el) {
+    document.querySelectorAll(".mood-option").forEach((m) => m.classList.remove("active"));
+    el.classList.add("active");
+  }
+
+  function selectExport(el) {
+    document.querySelectorAll(".export-card").forEach((c) => c.classList.remove("selected"));
+    el.classList.add("selected");
+  }
+
+  function showUpload() {
+    document.getElementById("upload-zone").style.display = "none";
+    document.getElementById("preview-row").style.display = "flex";
+  }
+
+  function removePreview(el) {
+    el.remove();
+    const row = document.getElementById("preview-row");
+    if (row.querySelectorAll(".preview-thumb").length === 0) {
+      row.style.display = "none";
+      document.getElementById("upload-zone").style.display = "block";
+    }
+  }
+
+  function addThumb() {
+    const row = document.getElementById("preview-row");
+    const thumb = document.createElement("div");
+    thumb.className = "preview-thumb";
+    thumb.innerHTML = ["🌅", "🌄", "🏙️", "🌊"][Math.floor(Math.random() * 4)] + '<div class="remove-btn" onclick="removePreview(this.parentNode)">×</div>';
+    row.insertBefore(thumb, row.lastElementChild);
+  }
+
+  function startGenerate() {
+    const overlay = document.getElementById("gen-overlay");
+    overlay.classList.add("show");
+    const steps = ["gs1", "gs2", "gs3", "gs4"];
+    steps.forEach((s, i) => {
+      const el = document.getElementById(s);
+      el.className = "gen-step " + (i === 0 ? "active" : "pending");
+      el.querySelector("i").className = "ti ti-" + ["loader", "loader", "music", "text-caption"][i];
+    });
+
+    let cur = 0;
+    const advance = () => {
+      if (cur < steps.length) {
+        const el = document.getElementById(steps[cur]);
+        el.className = "gen-step done";
+        el.querySelector("i").className = "ti ti-check";
+        cur++;
+        if (cur < steps.length) {
+          const next = document.getElementById(steps[cur]);
+          next.className = "gen-step active";
+        }
+        setTimeout(advance, 900);
+      } else {
+        setTimeout(() => {
+          overlay.classList.remove("show");
+          switchTab("preview", document.querySelectorAll(".tab")[2]);
+        }, 600);
+      }
+    };
+    setTimeout(advance, 600);
+  }
+</script>

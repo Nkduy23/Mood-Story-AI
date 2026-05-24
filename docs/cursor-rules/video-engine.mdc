@@ -1,0 +1,28 @@
+---
+description: Rules for video rendering, FFmpeg, Canvas
+globs: ["src/features/export/**", "src/lib/ffmpeg.ts", "src/features/editor/lib/canvas*"]
+---
+
+# Video Engine Rules
+
+## FFmpeg.wasm
+- Load lazy, không import ở top-level component.
+- Dùng singleton pattern từ `lib/ffmpeg.ts`.
+- Luôn show progress bar — user không được ngồi chờ không biết.
+- Cleanup files sau render: `ffmpeg.deleteFile(...)`.
+- Cần COOP/COEP headers — đã có trong `next.config.ts`, không xóa.
+
+## Canvas
+- Dùng `requestAnimationFrame` cho animation, không dùng `setInterval`.
+- Cleanup canvas context sau khi xong.
+- Output resolution: 1080x1920 (9:16). Không thay đổi.
+- FPS: 30. Không thay đổi.
+
+## Output Duration
+- Chỉ cho phép: 10, 15, 20, 25 giây.
+- Dùng `as const` type: `10 | 15 | 20 | 25`.
+
+## Mock Mode
+- Kiểm tra `process.env.NEXT_PUBLIC_USE_MOCK === 'true'` trước khi render thật.
+- Mock: serve từ `/public/mock/sample.mp4`.
+- Xem chi tiết: `docs/VIDEO_ENGINE.md`.

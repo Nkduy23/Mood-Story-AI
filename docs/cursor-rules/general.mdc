@@ -1,0 +1,37 @@
+---
+description: General rules for Mood Story AI project
+alwaysApply: true
+---
+
+# Mood Story AI — General Rules
+
+## Package Manager
+- Luôn dùng `pnpm`. Không dùng `npm install` hay `yarn add`.
+- Lệnh cài package: `pnpm add <package>`
+- Lệnh dev: `pnpm dev`
+- Lệnh build: `pnpm build`
+
+## TypeScript
+- Strict mode bật. Không dùng `any`.
+- Không dùng `@ts-ignore` trừ khi có comment giải thích.
+- Luôn type return value của async function.
+
+## Code Style
+- Mobile-first: base styles cho 375px, sau đó responsive lên.
+- Feature-based structure: code theo feature folder, không theo layer.
+- Component pattern: FC với interface Props riêng.
+- Named export, không default export (trừ Next.js pages).
+
+## State
+- Zustand cho global state. Không dùng React Context cho global.
+- Không prop drilling quá 2 level.
+- Subscribe từng field cụ thể, không lấy cả store object.
+
+## Error Handling
+- Mọi async operation phải có loading + error state.
+- AsyncState<T> pattern: `{ data, isLoading, error }`.
+- Luôn có UI fallback khi error.
+
+## Context tham khảo
+- Đọc `docs/CONTEXT.md` để hiểu toàn bộ dự án trước khi làm bất kỳ task nào.
+- File docs liên quan đến task cụ thể: xem bảng trong `docs/CONTEXT.md`.
