@@ -59,13 +59,13 @@
 ### 1.3 Create Page — AI Processing (Mock)
 
 ```
-[ ] AI loading state UI (animated steps: "Analyzing...", "Applying mood...", etc.)
-[ ] Gọi mock AI analysis (sleep 2.5s → trả MOCK_AI_RESULT)
-[ ] CaptionEditor component (editable text, mood-styled font)
-[ ] MusicSelector component (list tracks, play preview 5s)
-[ ] Duration selector (10 / 15 / 20 / 25s pills)
-[ ] "Shuffle" button → random seed mới, preview thay đổi
-[ ] CTA "Preview" → navigate /preview
+[x] AI loading state UI (animated steps: "Analyzing...", "Applying mood...", etc.)
+[x] Gọi mock AI analysis (sleep 2.5s → trả MOCK_AI_RESULT)
+[x] CaptionEditor component (editable text, mood-styled font)
+[x] MusicSelector component (list tracks, play preview 5s)
+[x] Duration selector (10 / 15 / 20 / 25s pills)
+[x] "Shuffle" button → random seed mới, preview thay đổi
+[x] CTA "Preview" → navigate /preview
 ```
 
 ### 1.4 Preview Page

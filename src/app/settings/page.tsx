@@ -181,7 +181,7 @@ export default function SettingsPage() {
 
   return (
     <>
-      <AboutModal open={showAbout} onClose={() => setShowAbout(false)} isVi={isVi} />;
+      <AboutModal open={showAbout} onClose={() => setShowAbout(false)} isVi={isVi} />
       <MobileContainer>
         {/* Header */}
         <header className="px-5 pt-12 pb-5 border-b border-[var(--border-subtle)]">

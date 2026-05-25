@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Button } from "@/components/ui/Button";
@@ -31,6 +31,12 @@ const SparkleIcon = () => (
   </svg>
 );
 
+const CheckIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 6L9 17l-5-5" />
+  </svg>
+);
+
 // ── Step Indicator ───────────────────────────────────────────────────────────
 
 function StepIndicator({ current, total }: { current: number; total: number }) {
@@ -53,7 +59,6 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
 
 function StepStoryType({ selected, onSelect }: { selected: StoryType | null; onSelect: (t: StoryType) => void }) {
   const { t, locale } = useI18n();
-
   return (
     <div className="flex flex-col gap-2">
       <div className="mb-1">
@@ -92,7 +97,6 @@ function StepStoryType({ selected, onSelect }: { selected: StoryType | null; onS
 
 function StepMoodPack({ selected, onSelect }: { selected: string | null; onSelect: (id: string) => void }) {
   const { t, locale } = useI18n();
-
   return (
     <div className="flex flex-col gap-2">
       <div className="mb-1">
@@ -133,7 +137,6 @@ function StepMoodPack({ selected, onSelect }: { selected: string | null; onSelec
 function StepUpload() {
   const { t } = useI18n();
   const { files, storyType, maxFiles, addFiles, removeFile, reorderFiles } = useUpload();
-
   return (
     <div className="flex flex-col gap-3">
       <div className="mb-1">
@@ -154,9 +157,136 @@ function StepUpload() {
   );
 }
 
+// ── Step 4: AI Processing ─────────────────────────────────────────────────────
+
+interface AIStep {
+  key: string;
+  labelVi: string;
+  labelEn: string;
+  duration: number; // ms
+}
+
+const AI_STEPS: AIStep[] = [
+  { key: "analyze", labelVi: "Phân tích ảnh của bạn", labelEn: "Analyzing your photos", duration: 800 },
+  { key: "mood", labelVi: "Áp dụng mood & màu sắc", labelEn: "Applying mood & color grade", duration: 600 },
+  { key: "music", labelVi: "Đồng bộ với nhạc", labelEn: "Syncing with music", duration: 500 },
+  { key: "caption", labelVi: "Tạo caption từ ảnh thật", labelEn: "Generating caption", duration: 600 },
+];
+
+// MOCK AI result — dùng cho dev, sẽ thay bằng API call thật ở V2
+const MOCK_AI_RESULT = {
+  narrativeOrder: [0, 1, 2],
+  selectedSegments: [
+    { fileId: "mock-0", startTime: 0, endTime: 5, score: 0.92, reason: "Good composition" },
+    { fileId: "mock-1", startTime: 2, endTime: 7, score: 0.87, reason: "Nice lighting" },
+  ],
+  overallVibe: "Late night city, reflective mood",
+  suggestedDuration: 15 as const,
+  caption: "some nights feel heavier than they look",
+  suggestedMusicId: "nd-01",
+};
+
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function StepAIProcessing({ onDone }: { onDone: () => void }) {
+  const { locale } = useI18n();
+  const setAIResult = useEditorStore((s) => s.setAIResult);
+  const setAIStatus = useEditorStore((s) => s.setAIStatus);
+
+  // currentStep: index đang chạy (-1 = chưa bắt đầu)
+  const [currentStep, setCurrentStep] = useState(-1);
+  const [doneSteps, setDoneSteps] = useState<Set<number>>(new Set());
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
+    const run = async () => {
+      setAIStatus("loading");
+
+      for (let i = 0; i < AI_STEPS.length; i++) {
+        setCurrentStep(i);
+        await sleep(AI_STEPS[i].duration);
+        setDoneSteps((prev) => new Set([...prev, i]));
+      }
+
+      // Mock: set result vào store
+      setAIResult(MOCK_AI_RESULT);
+      setAIStatus("done");
+
+      // Nhỏ delay rồi navigate
+      await sleep(400);
+      onDone();
+    };
+
+    run();
+  }, [onDone, setAIResult, setAIStatus]);
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-8 px-4">
+      {/* Animated logo / spinner */}
+      <div className="relative flex items-center justify-center">
+        {/* Outer ring */}
+        <div className="absolute w-24 h-24 rounded-full border-2 border-[var(--brand-purple-border)] animate-spin" style={{ animationDuration: "3s", borderTopColor: "var(--brand-purple)" }} />
+        {/* Inner glow */}
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--brand-gradient)", boxShadow: "0 0 32px rgba(155,124,244,0.5)" }}>
+          <SparkleIcon />
+        </div>
+      </div>
+
+      {/* Title */}
+      <div className="text-center">
+        <p className="text-lg font-bold text-[var(--text-primary)] mb-1">{locale === "vi" ? "AI đang xử lý..." : "AI is working..."}</p>
+        <p className="text-xs text-[var(--text-muted)]">{locale === "vi" ? "Vài giây thôi, đừng tắt trang nhé" : "Just a few seconds, don't close the tab"}</p>
+      </div>
+
+      {/* Step list */}
+      <div className="w-full max-w-[280px] flex flex-col gap-3">
+        {AI_STEPS.map((step, i) => {
+          const isDone = doneSteps.has(i);
+          const isActive = currentStep === i && !isDone;
+
+          return (
+            <div
+              key={step.key}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-2xl",
+                "border transition-all duration-300",
+                isDone
+                  ? "bg-[var(--brand-purple-dim)] border-[var(--brand-purple-border)]"
+                  : isActive
+                    ? "bg-[var(--bg-elevated)] border-[var(--border-card)]"
+                    : "bg-[var(--bg-card)] border-[var(--border-subtle)] opacity-40",
+              )}
+            >
+              {/* Status icon */}
+              <div
+                className={cn(
+                  "w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-300",
+                  isDone ? "bg-[var(--brand-purple)] text-white" : isActive ? "border-2 border-[var(--brand-purple)]" : "border border-[var(--border-card)]",
+                )}
+              >
+                {isDone ? <CheckIcon /> : isActive ? <span className="w-2 h-2 rounded-full bg-[var(--brand-purple)] animate-pulse" /> : null}
+              </div>
+
+              <p className={cn("text-sm transition-colors duration-300", isDone ? "text-[var(--text-primary)] font-medium" : isActive ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]")}>
+                {locale === "vi" ? step.labelVi : step.labelEn}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── Main Wizard Page ─────────────────────────────────────────────────────────
 
-const TOTAL_STEPS = 3;
+// step 0=type, 1=mood, 2=upload, 3=ai-processing
+const WIZARD_STEPS = 3; // chỉ hiện indicator cho 3 bước user thao tác
 
 export default function CreatePage() {
   const router = useRouter();
@@ -170,6 +300,8 @@ export default function CreatePage() {
   const selectMoodPack = useEditorStore((s) => s.selectMoodPack);
   const { files } = useUpload();
 
+  const isAIStep = step === 3;
+
   const handleBack = () => {
     if (step === 0) router.push("/");
     else setStep((s) => s - 1);
@@ -182,11 +314,14 @@ export default function CreatePage() {
     } else if (step === 1 && localMood) {
       selectMoodPack(localMood);
       setStep(2);
-    } else if (step === 2) router.push("/preview");
+    } else if (step === 2) {
+      setStep(3);
+    } // vào AI processing
   };
 
   const doneFiles = files.filter((f) => f.status === "done");
   const isUploading = files.some((f) => f.status === "uploading");
+
   const canNext = (step === 0 && localType !== null) || (step === 1 && localMood !== null) || (step === 2 && doneFiles.length > 0 && !isUploading);
 
   const ctaLabel = () => {
@@ -197,61 +332,57 @@ export default function CreatePage() {
     return t.home.continueBtn;
   };
 
-  // ── Nav height: 64px (--nav-height) ──
-  // Dùng h-dvh thay vì min-h-screen để có height cố định,
-  // flex col để header + content + cta luôn trong viewport
-
   return (
     <>
-      {/* 
-        Outer: center max-w-[430px] như MobileContainer
-        Inner: h-dvh fixed height, flex col
-               → header pin top, CTA pin bottom, content scroll giữa
-      */}
       <div className="min-h-dvh bg-[var(--bg-base)] flex justify-center">
         <div className="relative w-full max-w-[430px] flex flex-col" style={{ height: "100dvh", paddingBottom: "calc(var(--nav-height) + var(--safe-bottom))" }}>
-          {/* ── Header — luôn ở top ── */}
-          <header className="shrink-0 flex items-center justify-between px-5 pt-10 pb-3 border-b border-[var(--border-subtle)]">
-            <button
-              onClick={handleBack}
-              className={cn(
-                "w-9 h-9 rounded-xl flex items-center justify-center",
-                "bg-[var(--bg-card)] border border-[var(--border-subtle)]",
-                "text-[var(--text-muted)] hover:text-[var(--text-primary)]",
-                "transition-all duration-150 active:scale-90",
-              )}
-              aria-label="Quay lại"
-            >
-              <ArrowLeftIcon />
-            </button>
-            <StepIndicator current={step} total={TOTAL_STEPS} />
-            <span className="text-[10px] font-mono text-[var(--text-muted)] tabular-nums">
-              {step + 1} / {TOTAL_STEPS}
-            </span>
-          </header>
+          {/* ── Header — ẩn khi đang AI processing ── */}
+          {!isAIStep && (
+            <header className="shrink-0 flex items-center justify-between px-5 pt-10 pb-3 border-b border-[var(--border-subtle)]">
+              <button
+                onClick={handleBack}
+                className={cn(
+                  "w-9 h-9 rounded-xl flex items-center justify-center",
+                  "bg-[var(--bg-card)] border border-[var(--border-subtle)]",
+                  "text-[var(--text-muted)] hover:text-[var(--text-primary)]",
+                  "transition-all duration-150 active:scale-90",
+                )}
+                aria-label="Quay lại"
+              >
+                <ArrowLeftIcon />
+              </button>
+              <StepIndicator current={step} total={WIZARD_STEPS} />
+              <span className="text-[10px] font-mono text-[var(--text-muted)] tabular-nums">
+                {step + 1} / {WIZARD_STEPS}
+              </span>
+            </header>
+          )}
 
-          {/* ── Scrollable content — flex-1 + overflow-y-auto ── */}
-          <div className="flex-1 overflow-y-auto px-5 py-4">
+          {/* ── Content ── */}
+          <div className={cn("flex-1 overflow-y-auto", isAIStep ? "flex flex-col" : "px-5 py-4")}>
             {step === 0 && <StepStoryType selected={localType} onSelect={setLocalType} />}
             {step === 1 && <StepMoodPack selected={localMood} onSelect={setLocalMood} />}
             {step === 2 && <StepUpload />}
+            {step === 3 && <StepAIProcessing onDone={() => router.push("/preview")} />}
           </div>
 
-          {/* ── CTA — luôn ở bottom, không bị đẩy ra ngoài ── */}
-          <div className="shrink-0 px-5 py-3 border-t border-[var(--border-subtle)] bg-[var(--bg-base)]">
-            <Button
-              variant="gradient"
-              size="lg"
-              fullWidth
-              disabled={!canNext}
-              isLoading={isUploading}
-              onClick={handleNext}
-              rightIcon={!isUploading ? <ArrowRightIcon /> : undefined}
-              className={cn("shadow-xl shadow-[rgba(155,124,244,0.3)]", "transition-all duration-300", canNext && !isUploading && "animate-pulse-glow")}
-            >
-              {ctaLabel()}
-            </Button>
-          </div>
+          {/* ── CTA — ẩn khi AI processing ── */}
+          {!isAIStep && (
+            <div className="shrink-0 px-5 py-3 border-t border-[var(--border-subtle)] bg-[var(--bg-base)]">
+              <Button
+                variant="gradient"
+                size="lg"
+                fullWidth
+                disabled={!canNext}
+                isLoading={isUploading}
+                onClick={handleNext}
+                rightIcon={!isUploading ? <ArrowRightIcon /> : undefined}
+                className={cn("shadow-xl shadow-[rgba(155,124,244,0.3)]", "transition-all duration-300", canNext && !isUploading && "animate-pulse-glow")}
+              >
+                {ctaLabel()}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
