@@ -46,14 +46,14 @@
 ### 1.2 Create Page — Upload
 
 ```
-[ ] UploadZone component (drag & drop + tap)
-[ ] Validate file type (JPG/PNG/WEBP/MP4/MOV) và size (< 50MB)
-[ ] FileThumb component (preview với remove button)
-[ ] Reorder files bằng drag (Journey type)
-[ ] Show file count / max files limit
-[ ] Upload lên Cloudinary (mock: chỉ tạo object URL local)
-[ ] Lưu files vào uploadStore
-[ ] Progress indicator per file
+[x] UploadZone component (drag & drop + tap)
+[x] Validate file type (JPG/PNG/WEBP/MP4/MOV) và size (< 50MB)
+[x] FileThumb component (preview với remove button)
+[x] Reorder files bằng drag (Journey type)
+[x] Show file count / max files limit
+[x] Upload lên Cloudinary (mock: chỉ tạo object URL local)
+[x] Lưu files vào uploadStore
+[x] Progress indicator per file
 ```
 
 ### 1.3 Create Page — AI Processing (Mock)

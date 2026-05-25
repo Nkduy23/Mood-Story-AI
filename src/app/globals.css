@@ -221,3 +221,15 @@ html {
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
+
+
+[data-theme="light"] {
+  --bg-base: #f5f4ff;
+  --bg-card: #ffffff;
+  --bg-elevated: #ede9fe;
+  --text-primary: #1a1730;
+  --text-secondary: rgba(26,23,48,0.6);
+  --text-muted: rgba(26,23,48,0.35);
+  --border-subtle: rgba(0,0,0,0.07);
+  --border-card: rgba(0,0,0,0.1);
+}

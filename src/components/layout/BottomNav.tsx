@@ -46,12 +46,6 @@ const BottomNav: FC = () => {
   const pathname = usePathname();
   const { t } = useI18n();
 
-  // settings label fallback vì translations chưa có key này
-  const getLabel = (key: string) => {
-    if (key === "settings") return t.language.label === "Ngôn ngữ" ? "Cài đặt" : "Settings";
-    return t.nav[key as keyof typeof t.nav];
-  };
-
   return (
     <nav
       className={cn(
@@ -93,7 +87,7 @@ const BottomNav: FC = () => {
               ) : (
                 <>
                   <Icon filled={isActive} />
-                  <span className="text-[10px] font-medium tracking-wide">{getLabel(labelKey)}</span>
+                  <span className="text-[10px] font-medium tracking-wide">{t.nav[labelKey]}</span>
                 </>
               )}
             </Link>

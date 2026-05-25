@@ -11,6 +11,7 @@ export const translations = {
       home: "Home",
       create: "Create",
       preview: "Preview",
+      settings: "Settings",
     },
 
     // Home page
@@ -151,6 +152,7 @@ export const translations = {
       home: "Trang chủ",
       create: "Tạo mới",
       preview: "Xem trước",
+      settings: "Cài đặt",
     },
 
     // Home page
