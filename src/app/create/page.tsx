@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MobileContainer } from "@/components/layout/MobileContainer";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Button } from "@/components/ui/Button";
 import { useI18n } from "@/lib/i18n";
@@ -61,12 +60,10 @@ function StepStoryType({ selected, onSelect }: { selected: StoryType | null; onS
         <h2 className="text-xl font-bold text-[var(--text-primary)] mb-0.5">{t.home.pickType}</h2>
         <p className="text-xs text-[var(--text-muted)]">{locale === "vi" ? "Chọn loại story bạn muốn tạo" : "Choose the type of story"}</p>
       </div>
-
       {(Object.keys(STORY_TYPE_CONFIGS) as StoryType[]).map((typeId) => {
         const config = STORY_TYPE_CONFIGS[typeId];
         const typeT = t.storyTypes[typeId];
         const isSelected = selected === typeId;
-
         return (
           <button
             key={typeId}
@@ -102,11 +99,9 @@ function StepMoodPack({ selected, onSelect }: { selected: string | null; onSelec
         <h2 className="text-xl font-bold text-[var(--text-primary)] mb-0.5">{t.home.pickMood}</h2>
         <p className="text-xs text-[var(--text-muted)]">{locale === "vi" ? "Mỗi mood tạo ra cảm giác khác nhau" : "Each mood creates a different feeling"}</p>
       </div>
-
       {MOOD_PACKS.map((pack) => {
         const moodT = t.moods[pack.id as keyof typeof t.moods];
         const isSelected = selected === pack.id;
-
         return (
           <button
             key={pack.id}
@@ -145,11 +140,8 @@ function StepUpload() {
         <h2 className="text-xl font-bold text-[var(--text-primary)] mb-0.5">{t.upload.title}</h2>
         <p className="text-xs text-[var(--text-muted)]">{t.upload.subtitle}</p>
       </div>
-
       <UploadZone fileCount={files.length} maxFiles={maxFiles} storyType={storyType} onFilesSelected={addFiles} />
-
       {files.length > 0 && <MediaPreview files={files} storyType={storyType} onRemove={removeFile} onReorder={reorderFiles} />}
-
       {storyType === "journey" && files.length >= 2 && (
         <div className={cn("flex items-center gap-2 px-3 py-2.5 rounded-xl", "bg-[var(--bg-elevated)] border border-[var(--border-subtle)]")}>
           <span className="text-[var(--brand-purple)] shrink-0">
@@ -205,60 +197,63 @@ export default function CreatePage() {
     return t.home.continueBtn;
   };
 
+  // ── Nav height: 64px (--nav-height) ──
+  // Dùng h-dvh thay vì min-h-screen để có height cố định,
+  // flex col để header + content + cta luôn trong viewport
+
   return (
     <>
-      {/*
-        Layout: flex col, full height
-        - Header: shrink-0, luôn ở top
-        - Content: flex-1 overflow-y-auto (scroll bên trong)
-        - CTA: shrink-0, luôn ở bottom — không bao giờ bị đẩy ra ngoài viewport
+      {/* 
+        Outer: center max-w-[430px] như MobileContainer
+        Inner: h-dvh fixed height, flex col
+               → header pin top, CTA pin bottom, content scroll giữa
       */}
-      <MobileContainer className="flex flex-col">
-        {/* ── Header — fixed top ── */}
-        <header className="shrink-0 flex items-center justify-between px-5 pt-10 pb-3 border-b border-[var(--border-subtle)]">
-          <button
-            onClick={handleBack}
-            className={cn(
-              "w-9 h-9 rounded-xl flex items-center justify-center",
-              "bg-[var(--bg-card)] border border-[var(--border-subtle)]",
-              "text-[var(--text-muted)] hover:text-[var(--text-primary)]",
-              "transition-all duration-150 active:scale-90",
-            )}
-            aria-label="Quay lại"
-          >
-            <ArrowLeftIcon />
-          </button>
+      <div className="min-h-dvh bg-[var(--bg-base)] flex justify-center">
+        <div className="relative w-full max-w-[430px] flex flex-col" style={{ height: "100dvh", paddingBottom: "calc(var(--nav-height) + var(--safe-bottom))" }}>
+          {/* ── Header — luôn ở top ── */}
+          <header className="shrink-0 flex items-center justify-between px-5 pt-10 pb-3 border-b border-[var(--border-subtle)]">
+            <button
+              onClick={handleBack}
+              className={cn(
+                "w-9 h-9 rounded-xl flex items-center justify-center",
+                "bg-[var(--bg-card)] border border-[var(--border-subtle)]",
+                "text-[var(--text-muted)] hover:text-[var(--text-primary)]",
+                "transition-all duration-150 active:scale-90",
+              )}
+              aria-label="Quay lại"
+            >
+              <ArrowLeftIcon />
+            </button>
+            <StepIndicator current={step} total={TOTAL_STEPS} />
+            <span className="text-[10px] font-mono text-[var(--text-muted)] tabular-nums">
+              {step + 1} / {TOTAL_STEPS}
+            </span>
+          </header>
 
-          <StepIndicator current={step} total={TOTAL_STEPS} />
+          {/* ── Scrollable content — flex-1 + overflow-y-auto ── */}
+          <div className="flex-1 overflow-y-auto px-5 py-4">
+            {step === 0 && <StepStoryType selected={localType} onSelect={setLocalType} />}
+            {step === 1 && <StepMoodPack selected={localMood} onSelect={setLocalMood} />}
+            {step === 2 && <StepUpload />}
+          </div>
 
-          <span className="text-[10px] font-mono text-[var(--text-muted)] tabular-nums">
-            {step + 1} / {TOTAL_STEPS}
-          </span>
-        </header>
-
-        {/* ── Scrollable content ── */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">
-          {step === 0 && <StepStoryType selected={localType} onSelect={setLocalType} />}
-          {step === 1 && <StepMoodPack selected={localMood} onSelect={setLocalMood} />}
-          {step === 2 && <StepUpload />}
+          {/* ── CTA — luôn ở bottom, không bị đẩy ra ngoài ── */}
+          <div className="shrink-0 px-5 py-3 border-t border-[var(--border-subtle)] bg-[var(--bg-base)]">
+            <Button
+              variant="gradient"
+              size="lg"
+              fullWidth
+              disabled={!canNext}
+              isLoading={isUploading}
+              onClick={handleNext}
+              rightIcon={!isUploading ? <ArrowRightIcon /> : undefined}
+              className={cn("shadow-xl shadow-[rgba(155,124,244,0.3)]", "transition-all duration-300", canNext && !isUploading && "animate-pulse-glow")}
+            >
+              {ctaLabel()}
+            </Button>
+          </div>
         </div>
-
-        {/* ── CTA — luôn ở bottom, không bao giờ bị đẩy ra ── */}
-        <div className="shrink-0 px-5 py-3 border-t border-[var(--border-subtle)] bg-[var(--bg-base)]">
-          <Button
-            variant="gradient"
-            size="lg"
-            fullWidth
-            disabled={!canNext}
-            isLoading={isUploading}
-            onClick={handleNext}
-            rightIcon={!isUploading ? <ArrowRightIcon /> : undefined}
-            className={cn("shadow-xl shadow-[rgba(155,124,244,0.3)]", "transition-all duration-300", canNext && !isUploading && "animate-pulse-glow")}
-          >
-            {ctaLabel()}
-          </Button>
-        </div>
-      </MobileContainer>
+      </div>
 
       <BottomNav />
     </>
