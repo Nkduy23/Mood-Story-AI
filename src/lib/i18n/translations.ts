@@ -73,6 +73,8 @@ export const translations = {
       },
     },
 
+    // Property 'selectPrompt' does not exist on type '{ title: string; subtitle: string; tapToUpload: string; dragDrop: string; formats: string; maxFiles: string; addMore: string; processing: string; uploadError: string; }'.
+
     // Create / Upload
     upload: {
       title: "Upload your moments",
@@ -84,6 +86,7 @@ export const translations = {
       addMore: "Add more",
       processing: "Processing...",
       uploadError: "Upload failed, please try again",
+      selectPrompt: "Select your moments",
     },
 
     // Editor
@@ -221,6 +224,7 @@ export const translations = {
       addMore: "Thêm file",
       processing: "Đang xử lý...",
       uploadError: "Upload thất bại, thử lại nhé",
+      selectPrompt: "Chọn khoảnh khắc của bạn",
     },
 
     // Editor

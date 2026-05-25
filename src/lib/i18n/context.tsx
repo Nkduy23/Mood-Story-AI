@@ -1,7 +1,6 @@
 "use client";
 
-// lib/i18n/context.tsx
-import { createContext, useContext, useState, type FC, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type FC, type ReactNode } from "react";
 import { translations, type Locale } from "./translations";
 
 interface I18nContextValue {
@@ -13,20 +12,21 @@ interface I18nContextValue {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 export const I18nProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    // Đọc từ localStorage nếu có
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("ms-locale") as Locale | null;
-      if (saved && saved in translations) return saved;
+  // QUAN TRỌNG: luôn khởi tạo với "vi" — không đọc localStorage trong useState
+  // để tránh hydration mismatch (server không biết localStorage)
+  const [locale, setLocaleState] = useState<Locale>("vi");
+
+  // Đọc localStorage SAU khi mount (client-only)
+  useEffect(() => {
+    const saved = localStorage.getItem("ms-locale") as Locale | null;
+    if (saved && saved in translations) {
+      setLocaleState(saved);
     }
-    return "vi"; // default tiếng Việt
-  });
+  }, []);
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("ms-locale", newLocale);
-    }
+    localStorage.setItem("ms-locale", newLocale);
   };
 
   return <I18nContext.Provider value={{ locale, t: translations[locale], setLocale }}>{children}</I18nContext.Provider>;

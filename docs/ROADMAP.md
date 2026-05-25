@@ -15,15 +15,15 @@
 ## Phase 0 — Project Setup (làm đầu tiên)
 
 ```
-[ ] Init Next.js 14 với pnpm
-[ ] Cài dependencies: zustand, @ffmpeg/ffmpeg, @ffmpeg/util, clsx, tailwind-merge
-[ ] Setup Tailwind config (brand colors, surface colors)
-[ ] Setup TypeScript strict mode
-[ ] Setup folder structure theo FE_GUIDE.md
-[ ] Setup .env.local template
-[ ] Setup Cross-Origin headers cho FFmpeg.wasm (next.config.ts)
-[ ] Setup mock mode (NEXT_PUBLIC_USE_MOCK=true)
-[ ] Deploy lên Vercel lần đầu (empty app, chỉ để có URL)
+[x] Init Next.js 14 với pnpm
+[x] Cài dependencies: zustand, @ffmpeg/ffmpeg, @ffmpeg/util, clsx, tailwind-merge
+[x] Setup Tailwind config (brand colors, surface colors)
+[x] Setup TypeScript strict mode
+[x] Setup folder structure theo FE_GUIDE.md
+[x] Setup .env.local template
+[x] Setup Cross-Origin headers cho FFmpeg.wasm (next.config.ts)
+[x] Setup mock mode (NEXT_PUBLIC_USE_MOCK=true)
+[x] Deploy lên Vercel lần đầu (empty app, chỉ để có URL)
 ```
 
 ---
@@ -33,14 +33,14 @@
 ### 1.1 Home Page — Story Type + Mood Picker
 
 ```
-[ ] Layout MobileContainer (max-width 430px, centered)
-[ ] BottomNav component
-[ ] StoryTypePicker component (Moment / Journey / Vibe cards)
-[ ] MoodPackGrid component (6 mood cards với emoji + name)
-[ ] Lưu selection vào editorStore
-[ ] CTA button → navigate /create
-[ ] Animation: card selection có micro-animation
-[ ] Dark theme toàn bộ (màu theo UI prototype)
+[x] Layout MobileContainer (max-width 430px, centered)
+[x] BottomNav component
+[x] StoryTypePicker component (Moment / Journey / Vibe cards)
+[x] MoodPackGrid component (6 mood cards với emoji + name)
+[x] Lưu selection vào editorStore
+[x] CTA button → navigate /create
+[x] Animation: card selection có micro-animation
+[x] Dark theme toàn bộ (màu theo UI prototype)
 ```
 
 ### 1.2 Create Page — Upload
