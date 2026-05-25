@@ -53,43 +53,40 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
 // ── Step 1: Story Type ───────────────────────────────────────────────────────
 
 function StepStoryType({ selected, onSelect }: { selected: StoryType | null; onSelect: (t: StoryType) => void }) {
-  // FIX: destructure cả locale lẫn t từ useI18n — không dùng t.locale
   const { t, locale } = useI18n();
 
   return (
-    <div className="flex flex-col gap-3 animate-fade-in">
-      <div className="mb-2">
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t.home.pickType}</h2>
-        <p className="text-sm text-[var(--text-muted)]">{locale === "vi" ? "Chọn loại story bạn muốn tạo" : "Choose the type of story"}</p>
+    <div className="flex flex-col gap-2">
+      <div className="mb-1">
+        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-0.5">{t.home.pickType}</h2>
+        <p className="text-xs text-[var(--text-muted)]">{locale === "vi" ? "Chọn loại story bạn muốn tạo" : "Choose the type of story"}</p>
       </div>
 
-      <div className="flex flex-col gap-2">
-        {(Object.keys(STORY_TYPE_CONFIGS) as StoryType[]).map((typeId) => {
-          const config = STORY_TYPE_CONFIGS[typeId];
-          const typeT = t.storyTypes[typeId];
-          const isSelected = selected === typeId;
+      {(Object.keys(STORY_TYPE_CONFIGS) as StoryType[]).map((typeId) => {
+        const config = STORY_TYPE_CONFIGS[typeId];
+        const typeT = t.storyTypes[typeId];
+        const isSelected = selected === typeId;
 
-          return (
-            <button
-              key={typeId}
-              onClick={() => onSelect(typeId)}
-              className={cn(
-                "flex items-center gap-4 p-4 rounded-2xl text-left w-full",
-                "border transition-all duration-200 active:scale-[0.98]",
-                isSelected ? "bg-[var(--brand-purple-dim)] border-[var(--brand-purple-border)]" : "bg-[var(--bg-card)] border-[var(--border-subtle)] hover:border-[var(--border-card)]",
-              )}
-            >
-              <span className="text-3xl shrink-0">{config.emoji}</span>
-              <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-semibold", isSelected ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]")}>{typeT.name}</p>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5">{typeT.description}</p>
-                <p className="text-[10px] font-mono text-[var(--text-muted)] mt-1">{typeT.hint}</p>
-              </div>
-              {isSelected && <span className="w-2 h-2 rounded-full bg-[var(--brand-purple)] shrink-0" style={{ boxShadow: "0 0 6px var(--brand-purple)" }} />}
-            </button>
-          );
-        })}
-      </div>
+        return (
+          <button
+            key={typeId}
+            onClick={() => onSelect(typeId)}
+            className={cn(
+              "flex items-center gap-3 p-3.5 rounded-2xl text-left w-full",
+              "border transition-all duration-200 active:scale-[0.98]",
+              isSelected ? "bg-[var(--brand-purple-dim)] border-[var(--brand-purple-border)]" : "bg-[var(--bg-card)] border-[var(--border-subtle)] hover:border-[var(--border-card)]",
+            )}
+          >
+            <span className="text-2xl shrink-0">{config.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <p className={cn("text-sm font-semibold", isSelected ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]")}>{typeT.name}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">{typeT.description}</p>
+              <p className="text-[10px] font-mono text-[var(--text-muted)] mt-0.5">{typeT.hint}</p>
+            </div>
+            {isSelected && <span className="w-2 h-2 rounded-full bg-[var(--brand-purple)] shrink-0" style={{ boxShadow: "0 0 6px var(--brand-purple)" }} />}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -97,50 +94,41 @@ function StepStoryType({ selected, onSelect }: { selected: StoryType | null; onS
 // ── Step 2: Mood Pack ────────────────────────────────────────────────────────
 
 function StepMoodPack({ selected, onSelect }: { selected: string | null; onSelect: (id: string) => void }) {
-  // FIX: destructure cả locale lẫn t từ useI18n — không dùng t.locale
   const { t, locale } = useI18n();
 
   return (
-    <div className="flex flex-col gap-3 animate-fade-in">
-      <div className="mb-2">
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t.home.pickMood}</h2>
-        <p className="text-sm text-[var(--text-muted)]">{locale === "vi" ? "Mỗi mood sẽ tạo ra video với cảm giác khác nhau" : "Each mood creates a different visual feeling"}</p>
+    <div className="flex flex-col gap-2">
+      <div className="mb-1">
+        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-0.5">{t.home.pickMood}</h2>
+        <p className="text-xs text-[var(--text-muted)]">{locale === "vi" ? "Mỗi mood tạo ra cảm giác khác nhau" : "Each mood creates a different feeling"}</p>
       </div>
 
-      <div className="flex flex-col gap-2">
-        {MOOD_PACKS.map((pack) => {
-          const moodT = t.moods[pack.id as keyof typeof t.moods];
-          const isSelected = selected === pack.id;
+      {MOOD_PACKS.map((pack) => {
+        const moodT = t.moods[pack.id as keyof typeof t.moods];
+        const isSelected = selected === pack.id;
 
-          return (
-            <button
-              key={pack.id}
-              onClick={() => onSelect(pack.id)}
-              className={cn("flex items-center gap-3 p-4 rounded-2xl text-left w-full", "border transition-all duration-200 active:scale-[0.98]")}
-              style={
-                isSelected
-                  ? {
-                      background: `linear-gradient(135deg, ${pack.accentColor}20 0%, var(--bg-card) 100%)`,
-                      borderColor: `${pack.accentColor}50`,
-                    }
-                  : {
-                      background: "var(--bg-card)",
-                      borderColor: "var(--border-subtle)",
-                    }
-              }
-            >
-              <span className="flex items-center justify-center w-10 h-10 rounded-xl text-xl shrink-0" style={{ background: `${pack.accentColor}22` }}>
-                {pack.emoji}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-semibold", isSelected ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]")}>{moodT?.name ?? pack.name}</p>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{moodT?.description ?? ""}</p>
-              </div>
-              {isSelected && <span className="w-2 h-2 rounded-full shrink-0" style={{ background: pack.accentColor, boxShadow: `0 0 6px ${pack.accentColor}` }} />}
-            </button>
-          );
-        })}
-      </div>
+        return (
+          <button
+            key={pack.id}
+            onClick={() => onSelect(pack.id)}
+            className={cn("flex items-center gap-3 p-3.5 rounded-2xl text-left w-full", "border transition-all duration-200 active:scale-[0.98]")}
+            style={
+              isSelected
+                ? { background: `linear-gradient(135deg, ${pack.accentColor}20 0%, var(--bg-card) 100%)`, borderColor: `${pack.accentColor}50` }
+                : { background: "var(--bg-card)", borderColor: "var(--border-subtle)" }
+            }
+          >
+            <span className="flex items-center justify-center w-9 h-9 rounded-xl text-lg shrink-0" style={{ background: `${pack.accentColor}22` }}>
+              {pack.emoji}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className={cn("text-sm font-semibold", isSelected ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]")}>{moodT?.name ?? pack.name}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{moodT?.description ?? ""}</p>
+            </div>
+            {isSelected && <span className="w-2 h-2 rounded-full shrink-0" style={{ background: pack.accentColor, boxShadow: `0 0 6px ${pack.accentColor}` }} />}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -152,10 +140,10 @@ function StepUpload() {
   const { files, storyType, maxFiles, addFiles, removeFile, reorderFiles } = useUpload();
 
   return (
-    <div className="flex flex-col gap-4 animate-fade-in">
-      <div className="mb-2">
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t.upload.title}</h2>
-        <p className="text-sm text-[var(--text-muted)]">{t.upload.subtitle}</p>
+    <div className="flex flex-col gap-3">
+      <div className="mb-1">
+        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-0.5">{t.upload.title}</h2>
+        <p className="text-xs text-[var(--text-muted)]">{t.upload.subtitle}</p>
       </div>
 
       <UploadZone fileCount={files.length} maxFiles={maxFiles} storyType={storyType} onFilesSelected={addFiles} />
@@ -182,7 +170,7 @@ export default function CreatePage() {
   const router = useRouter();
   const { t } = useI18n();
 
-  const [step, setStep] = useState(0); // 0=type, 1=mood, 2=upload
+  const [step, setStep] = useState(0);
   const [localType, setLocalType] = useState<StoryType | null>(null);
   const [localMood, setLocalMood] = useState<string | null>(null);
 
@@ -191,11 +179,8 @@ export default function CreatePage() {
   const { files } = useUpload();
 
   const handleBack = () => {
-    if (step === 0) {
-      router.push("/");
-    } else {
-      setStep((s) => s - 1);
-    }
+    if (step === 0) router.push("/");
+    else setStep((s) => s - 1);
   };
 
   const handleNext = () => {
@@ -205,14 +190,11 @@ export default function CreatePage() {
     } else if (step === 1 && localMood) {
       selectMoodPack(localMood);
       setStep(2);
-    } else if (step === 2) {
-      router.push("/preview");
-    }
+    } else if (step === 2) router.push("/preview");
   };
 
   const doneFiles = files.filter((f) => f.status === "done");
   const isUploading = files.some((f) => f.status === "uploading");
-
   const canNext = (step === 0 && localType !== null) || (step === 1 && localMood !== null) || (step === 2 && doneFiles.length > 0 && !isUploading);
 
   const ctaLabel = () => {
@@ -225,9 +207,15 @@ export default function CreatePage() {
 
   return (
     <>
-      <MobileContainer>
-        {/* ── Header ── */}
-        <header className="flex items-center justify-between px-5 pt-12 pb-4">
+      {/*
+        Layout: flex col, full height
+        - Header: shrink-0, luôn ở top
+        - Content: flex-1 overflow-y-auto (scroll bên trong)
+        - CTA: shrink-0, luôn ở bottom — không bao giờ bị đẩy ra ngoài viewport
+      */}
+      <MobileContainer className="flex flex-col">
+        {/* ── Header — fixed top ── */}
+        <header className="shrink-0 flex items-center justify-between px-5 pt-10 pb-3 border-b border-[var(--border-subtle)]">
           <button
             onClick={handleBack}
             className={cn(
@@ -243,20 +231,20 @@ export default function CreatePage() {
 
           <StepIndicator current={step} total={TOTAL_STEPS} />
 
-          <span className="text-[10px] font-mono text-[var(--text-muted)]">
+          <span className="text-[10px] font-mono text-[var(--text-muted)] tabular-nums">
             {step + 1} / {TOTAL_STEPS}
           </span>
         </header>
 
-        {/* ── Step Content ── */}
-        <div className="px-5 pb-6">
+        {/* ── Scrollable content ── */}
+        <div className="flex-1 overflow-y-auto px-5 py-4">
           {step === 0 && <StepStoryType selected={localType} onSelect={setLocalType} />}
           {step === 1 && <StepMoodPack selected={localMood} onSelect={setLocalMood} />}
           {step === 2 && <StepUpload />}
         </div>
 
-        {/* ── CTA — không dùng sticky, để flow tự nhiên cuối page ── */}
-        <div className="px-5 pb-4 mt-auto">
+        {/* ── CTA — luôn ở bottom, không bao giờ bị đẩy ra ── */}
+        <div className="shrink-0 px-5 py-3 border-t border-[var(--border-subtle)] bg-[var(--bg-base)]">
           <Button
             variant="gradient"
             size="lg"
@@ -265,7 +253,7 @@ export default function CreatePage() {
             isLoading={isUploading}
             onClick={handleNext}
             rightIcon={!isUploading ? <ArrowRightIcon /> : undefined}
-            className={cn("shadow-2xl shadow-[rgba(155,124,244,0.4)]", "transition-all duration-300", canNext && !isUploading && "animate-pulse-glow")}
+            className={cn("shadow-xl shadow-[rgba(155,124,244,0.3)]", "transition-all duration-300", canNext && !isUploading && "animate-pulse-glow")}
           >
             {ctaLabel()}
           </Button>
