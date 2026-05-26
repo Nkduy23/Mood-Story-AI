@@ -12,6 +12,40 @@ import { getMoodPack } from "@/features/mood-engine";
 import { useCanvasPreview } from "@/features/editor/hooks/useCanvasPreview";
 import { useFFmpegRender } from "@/features/export/hooks/useFFmpegRender";
 
+const RENDER_TIPS_VI = [
+  "AI đã chọn khoảnh khắc đẹp nhất trong ảnh của bạn ✨",
+  "Video được tối ưu cho Instagram & TikTok 9:16",
+  "Caption được viết dựa trên nội dung ảnh thật",
+  "Nhạc sẽ được sync đúng beat vào video",
+  "Thêm nhiều ảnh → story phong phú hơn",
+];
+
+const RENDER_TIPS_EN = [
+  "AI picked the best moments from your photos ✨",
+  "Video optimized for Instagram & TikTok 9:16",
+  "Caption written based on your actual photo content",
+  "Music will be synced to the beat",
+  "More photos = richer story",
+];
+
+function RenderTips({ locale }: { locale: string }) {
+  const [index, setIndex] = useState(0);
+  const tips = locale === "vi" ? RENDER_TIPS_VI : RENDER_TIPS_EN;
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % tips.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, [tips.length]);
+
+  return (
+    <p key={index} className="text-xs text-center text-[var(--text-muted)] px-4 animate-fade-in">
+      {tips[index]}
+    </p>
+  );
+}
+
 const ShuffleIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
@@ -90,6 +124,8 @@ function RenderProgressBar({ progress, stage }: { progress: number; stage: strin
           ~{est}s {locale === "vi" ? "còn lại" : "remaining"}
         </p>
       )}
+
+      {progress < 100 && <RenderTips locale={locale} />}
     </div>
   );
 }
@@ -155,7 +191,7 @@ export default function PreviewPage() {
       resolvedParams,
       caption: editedCaption,
       totalDuration: selectedDuration,
-      musicFilename: resolvedParams.musicTrack?.filename,
+      musicUrl: resolvedParams.musicTrack?.url,
     });
   }, [render, files, resolvedParams, editedCaption, selectedDuration]);
 

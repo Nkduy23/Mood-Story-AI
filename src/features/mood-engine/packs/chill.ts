@@ -19,7 +19,7 @@ export const chill: MoodPack = {
     { id: "slow-out", startScale: 1.03, endScale: 1.0, startX: 0, endX: 0, startY: 0, endY: 0 },
   ],
   animationSpeeds: [1.0, 1.2],
-  musicPool: [{ id: "ch-01", filename: "chill-01.mp3", name: "Chill Vibes", bpm: 75, duration: 180, mood: ["chill"], beatMarkers: [12, 24, 36] }],
+  musicTags: ["chill", "lofi", "cafe", "bossa", "focus"],
   colorTone: { shadows: "#1a2010", highlights: "#f0ece0", midtones: "#4a5a3a" },
   captionPromptHint: "Peaceful, soft, gentle, simple observations, quiet moments, lowercase",
 };

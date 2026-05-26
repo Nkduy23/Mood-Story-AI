@@ -19,7 +19,7 @@ export const coding: MoodPack = {
     { id: "pan-right", startScale: 1.04, endScale: 1.04, startX: 0, endX: -15, startY: 0, endY: 0 },
   ],
   animationSpeeds: [0.9, 1.0],
-  musicPool: [{ id: "co-01", filename: "coding-01.mp3", name: "Focus Mode", bpm: 80, duration: 180, mood: ["coding"], beatMarkers: [10, 20, 30] }],
+  musicTags: ["lofi", "focus", "coding", "ambient"],
   colorTone: { shadows: "#050a10", highlights: "#d0f0e8", midtones: "#0a2030" },
   captionPromptHint: "Focused, minimal, technical aesthetic, lowercase, short",
 };

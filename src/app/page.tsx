@@ -149,7 +149,7 @@ export default function HomePage() {
               }}
             />
             <p className="relative text-[9px] font-semibold text-[var(--brand-purple)] uppercase tracking-widest mb-2 font-mono">
-              {isVi ? "✦ Tạo story đẹp trong 30 giây" : "✦ Beautiful stories in 30 seconds"}
+              {isVi ? "✦ Upload → AI → Export MP4" : "✦ Upload → AI → Export MP4"}
             </p>
             <h2 className="relative text-2xl font-bold text-[var(--text-primary)] leading-tight mb-2">
               {isVi ? (

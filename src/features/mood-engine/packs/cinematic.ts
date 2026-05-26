@@ -19,7 +19,7 @@ export const cinematic: MoodPack = {
     { id: "wide-pan", startScale: 1.08, endScale: 1.08, startX: 20, endX: -20, startY: 0, endY: 0 },
   ],
   animationSpeeds: [0.8, 1.0],
-  musicPool: [{ id: "ci-01", filename: "cinematic-01.mp3", name: "Epic Rise", bpm: 90, duration: 180, mood: ["cinematic"], beatMarkers: [8, 16, 32] }],
+  musicTags: ["cinematic", "dramatic", "product", "ambient"],
   colorTone: { shadows: "#0a0800", highlights: "#fff5e0", midtones: "#3a2800" },
   captionPromptHint: "Epic, dramatic, powerful, cinematic, uppercase or title case",
 };

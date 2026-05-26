@@ -31,14 +31,15 @@ export interface KenBurnsPreset {
 
 export interface MusicTrack {
   id: string;
-  filename: string; // /public/music/
+  url: string; // Cloudinary URL
   name: string;
+  genre: string;
   bpm: number;
-  duration: number; // giây
-  mood: string[];
-  beatMarkers: number[]; // timestamps beat drop
+  duration: number;
+  energy: "low" | "mid" | "high";
+  tags: string[]; // thay mood
+  beatMarkers: number[];
 }
-
 export interface MoodPack {
   id: string;
   name: string; // tên kỹ thuật (không dịch)
@@ -51,7 +52,7 @@ export interface MoodPack {
   fontFamilies: FontFamily[];
   kenBurnsOptions: KenBurnsPreset[];
   animationSpeeds: number[];
-  musicPool: MusicTrack[];
+  musicTags: string[];
 
   colorTone: {
     shadows: string;

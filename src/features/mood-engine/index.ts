@@ -4,7 +4,8 @@ import { sad } from "./packs/sad";
 import { coding } from "./packs/coding";
 import { cinematic } from "./packs/cinematic";
 import { neon } from "./packs/neon";
-import type { MoodPack, StoryType } from "./types";
+import type { MoodPack, MusicTrack, StoryType } from "./types";
+import { MUSIC_LIBRARY } from "@/lib/musicLibrary";
 
 export { generateSeed, resolveSeed } from "./randomizer";
 export type { MoodPack, MoodSeed, ResolvedPackParams, StoryType, StoryTypeConfig, AllowedDuration } from "./types";
@@ -27,4 +28,8 @@ export function getMaxFiles(storyType: StoryType): number {
     vibe: 3,
   };
   return map[storyType];
+}
+
+export function getTracksByTags(tags: string[]): MusicTrack[] {
+  return MUSIC_LIBRARY.filter((track) => track.tags.some((t) => tags.includes(t)));
 }

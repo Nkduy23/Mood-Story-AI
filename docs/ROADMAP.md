@@ -133,18 +133,18 @@
 ## V2 — Real AI Integration
 
 ```
-[ ] Setup OpenAI client (server-side)
-[ ] API Route: POST /api/ai/analyze (GPT-4o Vision)
-[ ] API Route: POST /api/ai/caption (GPT-4o-mini)
-[ ] API Route: POST /api/ai/music (GPT-4o-mini)
-[ ] Cloudinary upload thật (thay mock)
-[ ] useAIAnalysis hook (real calls)
-[ ] Error retry logic (rate limit)
-[ ] Cost tracking (log tokens/call)
-[ ] Beat sync: transition tại đúng beat marker
-[ ] Narrative reorder theo AI result
-[ ] Segment selection: cắt video đúng timestamp AI chọn
-[ ] FFmpeg trim video: -ss startTime -t duration
+[x] Setup OpenAI client (server-side)
+[x] API Route: POST /api/ai/analyze (GPT-4o Vision)
+[x] API Route: POST /api/ai/caption (GPT-4o-mini)
+[x] API Route: POST /api/ai/music (GPT-4o-mini)
+[x] Cloudinary upload thật (thay mock)
+[x] useAIAnalysis hook (real calls)
+[x] Error retry logic (rate limit)
+[x] Cost tracking (log tokens/call)
+[x] Beat sync: transition tại đúng beat marker
+[x] Narrative reorder theo AI result
+[x] Segment selection: cắt video đúng timestamp AI chọn
+[x] FFmpeg trim video: -ss startTime -t duration
 ```
 
 ---

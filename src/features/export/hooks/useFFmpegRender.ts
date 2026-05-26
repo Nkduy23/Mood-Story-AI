@@ -16,7 +16,7 @@ interface RenderOptions {
   resolvedParams: ResolvedPackParams;
   caption: string;
   totalDuration: 10 | 15 | 20 | 25;
-  musicFilename?: string;
+  musicUrl?: string; // ← đổi từ musicFilename sang musicUrl (Cloudinary URL)
 }
 
 interface UseFFmpegRenderReturn {
@@ -30,10 +30,8 @@ interface UseFFmpegRenderReturn {
   reset: () => void;
 }
 
-// ── JPEG thay PNG: nhanh hơn 3-5x ──────────────────────────────────────────
 async function canvasToUint8Array(canvas: HTMLCanvasElement): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
-    // JPEG quality 0.85 — đủ cho preview, encode nhanh hơn PNG nhiều
     canvas.toBlob(
       (blob) => {
         if (!blob) {
@@ -51,12 +49,10 @@ async function canvasToUint8Array(canvas: HTMLCanvasElement): Promise<Uint8Array
   });
 }
 
-// ── Mock render với timing log ──────────────────────────────────────────────
 async function createMockBlob(setProgress: (n: number) => void, setStage: (s: RenderStage) => void): Promise<{ blob: Blob; url: string }> {
   const t0 = performance.now();
   const mark = (label: string) => console.log(`[FFmpeg] ${label}: ${((performance.now() - t0) / 1000).toFixed(2)}s`);
 
-  // Step 1: Load FFmpeg
   setStage("loading-ffmpeg");
   setProgress(5);
   mark("start load FFmpeg");
@@ -64,15 +60,11 @@ async function createMockBlob(setProgress: (n: number) => void, setStage: (s: Re
   mark("FFmpeg loaded ✓");
   setProgress(15);
 
-  // Step 2: Render frames
   setStage("encoding");
   const canvas = document.createElement("canvas");
-  // 540×960 thay 1080×1920 — đủ cho mock, nhanh hơn 4x
   canvas.width = 540;
   canvas.height = 960;
   const ctx = canvas.getContext("2d")!;
-
-  // Mock chỉ cần 15 frame (0.5s) thay vì 30 — đủ để test flow
   const totalFrames = 15;
   mark("start render frames");
 
@@ -80,13 +72,11 @@ async function createMockBlob(setProgress: (n: number) => void, setStage: (s: Re
     const hue = (i / totalFrames) * 60 + 240;
     ctx.fillStyle = `hsl(${hue}, 60%, 8%)`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     const grad = ctx.createRadialGradient(270, 480, 0, 270, 480, 350);
     grad.addColorStop(0, `hsla(${hue + 60}, 80%, 30%, 0.4)`);
     grad.addColorStop(1, "transparent");
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     ctx.fillStyle = `hsla(${hue + 60}, 80%, 80%, 0.9)`;
     ctx.font = "bold 28px monospace";
     ctx.textAlign = "center";
@@ -94,35 +84,17 @@ async function createMockBlob(setProgress: (n: number) => void, setStage: (s: Re
     ctx.font = "16px monospace";
     ctx.fillStyle = "rgba(255,255,255,0.4)";
     ctx.fillText("preview", 270, 495);
-
     const data = await canvasToUint8Array(canvas);
-    // JPEG trong FFmpeg cần extension .jpg
     await ffmpeg.writeFile(`frame${String(i).padStart(5, "0")}.jpg`, data);
     setProgress(15 + Math.round((i / totalFrames) * 60));
   }
 
   mark("frames done ✓");
   setProgress(78);
-
-  // Step 3: Encode
   mark("start FFmpeg encode");
-  await ffmpeg.exec([
-    "-framerate",
-    "15", // 15fps cho mock — nhanh hơn 2x encode
-    "-i",
-    "frame%05d.jpg",
-    "-c:v",
-    "libx264",
-    "-preset",
-    "ultrafast", // ultrafast thay fast
-    "-crf",
-    "32", // quality thấp hơn 1 chút, encode nhanh hơn
-    "-pix_fmt",
-    "yuv420p",
-    "-movflags",
-    "faststart",
-    "mock_out.mp4",
-  ]);
+
+  await ffmpeg.exec(["-framerate", "15", "-i", "frame%05d.jpg", "-c:v", "libx264", "-preset", "ultrafast", "-crf", "32", "-pix_fmt", "yuv420p", "-movflags", "faststart", "mock_out.mp4"]);
+
   mark("FFmpeg encode done ✓");
   setProgress(95);
 
@@ -145,7 +117,6 @@ async function createMockBlob(setProgress: (n: number) => void, setStage: (s: Re
   return { blob, url: URL.createObjectURL(blob) };
 }
 
-// ── Hook ────────────────────────────────────────────────────────────────────
 export function useFFmpegRender(): UseFFmpegRenderReturn {
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState<RenderStage>("idle");
@@ -167,7 +138,8 @@ export function useFFmpegRender(): UseFFmpegRenderReturn {
   }, []);
 
   const render = useCallback(async (options: RenderOptions) => {
-    const { files, resolvedParams, caption, totalDuration, musicFilename } = options;
+    const { files, resolvedParams, caption, totalDuration, musicUrl } = options; // ← musicUrl
+
     abortRef.current = false;
     setProgress(0);
     setError(null);
@@ -185,7 +157,6 @@ export function useFFmpegRender(): UseFFmpegRenderReturn {
         return;
       }
 
-      // ── REAL RENDER (không thay đổi) ──────────────────────────────────────
       const doneFiles = files.filter((f) => f.status === "done");
       if (doneFiles.length === 0) throw new Error("Không có file để render");
 
@@ -246,7 +217,6 @@ export function useFFmpegRender(): UseFFmpegRenderReturn {
         await ffmpeg.writeFile(`frame${String(frame).padStart(5, "0")}.jpg`, data);
         setProgress(10 + Math.round((frame / totalFrames) * 70));
 
-        // Log mỗi 30 frame (mỗi giây)
         if (frame > 0 && frame % 30 === 0) {
           const elapsed = (performance.now() - t0) / 1000;
           const fps = frame / elapsed;
@@ -258,19 +228,37 @@ export function useFFmpegRender(): UseFFmpegRenderReturn {
       setProgress(80);
 
       const args = ["-framerate", "30", "-i", "frame%05d.jpg"];
-      if (musicFilename) {
+
+      // ── Audio: fetch từ Cloudinary URL thay vì local /music/ ──────────────
+      if (musicUrl) {
         try {
-          const audio = await fetchFile(`/music/${musicFilename}`);
+          const audio = await fetchFile(musicUrl); // ← dùng URL trực tiếp
           await ffmpeg.writeFile("audio.mp3", audio);
           args.push("-i", "audio.mp3");
           setStage("muxing-audio");
-        } catch {
-          /**/
+        } catch (audioErr) {
+          // Không có nhạc thì vẫn render video, không fail toàn bộ
+          console.warn("[Render] audio fetch failed, rendering without music:", audioErr);
         }
       }
 
-      args.push("-c:v", "libx264", "-preset", "fast", "-crf", "23", "-pix_fmt", "yuv420p", ...(musicFilename ? ["-c:a", "aac", "-shortest"] : []), "-movflags", "faststart", "output.mp4");
-
+      const hasAudio = args.includes("-i") && args[args.indexOf("-i") + 1] === "audio.mp3";
+      args.push(
+        "-c:v",
+        "libx264",
+        "-preset",
+        "fast",
+        "-crf",
+        "23",
+        "-pix_fmt",
+        "yuv420p",
+        "-t",
+        String(totalDuration), // ← thêm dòng này
+        ...(hasAudio ? ["-c:a", "aac"] : []), // ← bỏ -shortest
+        "-movflags",
+        "faststart",
+        "output.mp4",
+      );
       await ffmpeg.exec(args);
       setProgress(95);
 
@@ -278,6 +266,7 @@ export function useFFmpegRender(): UseFFmpegRenderReturn {
       const blob = new Blob([raw.slice().buffer], { type: "video/mp4" });
       const url = URL.createObjectURL(blob);
 
+      // Cleanup WASM filesystem
       for (let i = 0; i < totalFrames; i++) {
         try {
           await ffmpeg.deleteFile(`frame${String(i).padStart(5, "0")}.jpg`);
@@ -309,14 +298,5 @@ export function useFFmpegRender(): UseFFmpegRenderReturn {
     }
   }, []);
 
-  return {
-    render,
-    progress,
-    stage,
-    outputBlob,
-    outputUrl,
-    error,
-    isRendering: !["idle", "done", "error"].includes(stage),
-    reset,
-  };
+  return { render, progress, stage, outputBlob, outputUrl, error, isRendering: !["idle", "done", "error"].includes(stage), reset };
 }

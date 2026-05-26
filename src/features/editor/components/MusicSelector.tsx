@@ -3,7 +3,7 @@
 import { type FC, useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/editorStore";
-import { getMoodPack } from "@/features/mood-engine";
+import { getMoodPack, getTracksByTags } from "@/features/mood-engine";
 import type { MusicTrack } from "@/features/mood-engine/types";
 
 // ── Icons ────────────────────────────────────────────────────────────────────
@@ -91,7 +91,8 @@ const MusicSelector: FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Lấy tracks từ mood pack hiện tại
-  const tracks: MusicTrack[] = selectedMoodPackId ? getMoodPack(selectedMoodPackId).musicPool : [];
+  const moodPack = selectedMoodPackId ? getMoodPack(selectedMoodPackId) : null;
+  const tracks: MusicTrack[] = moodPack ? getTracksByTags(moodPack.musicTags) : [];
 
   // Cleanup audio khi unmount
   useEffect(() => {
@@ -113,7 +114,7 @@ const MusicSelector: FC = () => {
     audioRef.current?.pause();
 
     // Play track mới (preview 5s đầu)
-    const audio = new Audio(`/music/${track.filename}`);
+    const audio = new Audio(track.url);
     audio.volume = 0.6;
 
     // Stop sau 5s

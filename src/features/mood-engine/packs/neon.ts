@@ -19,7 +19,7 @@ export const neon: MoodPack = {
     { id: "city-drift", startScale: 1.06, endScale: 1.06, startX: -15, endX: 15, startY: 0, endY: 0 },
   ],
   animationSpeeds: [1.0, 1.2],
-  musicPool: [{ id: "ne-01", filename: "neon-01.mp3", name: "Neon City", bpm: 100, duration: 180, mood: ["neon"], beatMarkers: [6, 12, 18] }],
+  musicTags: ["electronic", "night-drive", "late-night"],
   colorTone: { shadows: "#05000f", highlights: "#f0d0ff", midtones: "#1a0030" },
   captionPromptHint: "Cyberpunk, vibrant, city life, edgy, lowercase, punchy",
 };

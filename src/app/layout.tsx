@@ -78,13 +78,25 @@ export const viewport: Viewport = {
   themeColor: "#08080f",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="vi" data-theme="dark" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        {/* Chạy trước React hydration — không có FOUC */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var s = JSON.parse(localStorage.getItem('ms-settings') || '{}');
+                var dark = s.state?.darkMode !== false;
+                document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+              } catch(e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+              }
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <I18nProvider>
           <ThemeProvider>{children}</ThemeProvider>

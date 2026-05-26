@@ -32,7 +32,7 @@ interface UploadStore {
   reset: () => void;
 }
 
-export const useUploadStore = create<UploadStore>((set) => ({
+export const useUploadStore = create<UploadStore>((set, get) => ({
   files: [],
   storyType: null,
 
@@ -57,9 +57,11 @@ export const useUploadStore = create<UploadStore>((set) => ({
     })),
 
   removeFile: (id) =>
-    set((state) => ({
-      files: state.files.filter((f) => f.id !== id),
-    })),
+    set((state) => {
+      const file = state.files.find((f) => f.id === id);
+      if (file?.url.startsWith("blob:")) URL.revokeObjectURL(file.url);
+      return { files: state.files.filter((f) => f.id !== id) };
+    }),
 
   reorderFiles: (from, to) =>
     set((state) => {
@@ -81,5 +83,10 @@ export const useUploadStore = create<UploadStore>((set) => ({
 
   setStoryType: (storyType) => set({ storyType }),
 
-  reset: () => set({ files: [], storyType: null }),
+  reset: () => {
+    get().files.forEach((f) => {
+      if (f.url.startsWith("blob:")) URL.revokeObjectURL(f.url);
+    });
+    set({ files: [], storyType: null });
+  },
 }));

@@ -19,17 +19,7 @@ export const nightDrive: MoodPack = {
     { id: "zoom-out", startScale: 1.05, endScale: 1.0, startX: 0, endX: 0, startY: 0, endY: 10 },
   ],
   animationSpeeds: [0.8, 1.0],
-  musicPool: [
-    {
-      id: "nd-01",
-      filename: "night-drive-01.mp3",
-      name: "Midnight Drive",
-      bpm: 85,
-      duration: 180,
-      mood: ["night-drive"],
-      beatMarkers: [8, 16, 24],
-    },
-  ],
+  musicTags: ["night-drive", "electronic", "ambient", "late-night"],
   colorTone: { shadows: "#0a1628", highlights: "#f5e6d0", midtones: "#1a3a5c" },
   captionPromptHint: "Melancholic, late night, introspective, poetic, lowercase, no punctuation",
 };

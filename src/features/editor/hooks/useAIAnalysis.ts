@@ -5,6 +5,7 @@ import { useEditorStore } from "@/store/editorStore";
 import { getMoodPack } from "@/features/mood-engine";
 import type { UploadedFile } from "@/store/uploadStore";
 import type { StoryType } from "@/features/mood-engine";
+import { useI18n } from "@/lib/i18n";
 
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
 
@@ -51,6 +52,8 @@ export function useAIAnalysis(): UseAIAnalysisReturn {
 
   const setAIResult = useEditorStore((s) => s.setAIResult);
   const setAIStatus = useEditorStore((s) => s.setAIStatus);
+
+  const { locale } = useI18n();
 
   const reset = useCallback(() => {
     setStatus("idle");
@@ -114,6 +117,7 @@ export function useAIAnalysis(): UseAIAnalysisReturn {
               imageUrl: bestFile.url,
               moodPackId,
               captionPromptHint: pack.captionPromptHint,
+              locale,
             }),
           }).then(async (r) => {
             if (!r.ok) throw new Error(await r.text());
@@ -131,7 +135,7 @@ export function useAIAnalysis(): UseAIAnalysisReturn {
               moodPackId,
               storyType,
               overallVibe: analysis.overallVibe,
-              availableTracks: pack.musicPool,
+              availableTracks: pack.musicTags,
             }),
           }).then(async (r) => {
             if (!r.ok) throw new Error(await r.text());
@@ -146,7 +150,7 @@ export function useAIAnalysis(): UseAIAnalysisReturn {
           overallVibe: analysis.overallVibe ?? "",
           suggestedDuration: analysis.suggestedDuration ?? 15,
           caption: captionData.caption ?? "",
-          suggestedMusicId: musicData.trackId ?? pack.musicPool[0]?.id ?? "",
+          suggestedMusicId: musicData.trackId ?? "",
         });
 
         setStatus("done");

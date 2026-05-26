@@ -19,7 +19,7 @@ export const sad: MoodPack = {
     { id: "sink-slow", startScale: 1.0, endScale: 1.04, startX: 0, endX: 0, startY: 0, endY: 15 },
   ],
   animationSpeeds: [0.7, 0.9],
-  musicPool: [{ id: "sd-01", filename: "sad-01.mp3", name: "Rainy Days", bpm: 65, duration: 180, mood: ["sad"], beatMarkers: [10, 20, 30] }],
+  musicTags: ["piano", "sad", "nostalgic", "ambient"],
   colorTone: { shadows: "#0d0a14", highlights: "#e8e0f0", midtones: "#2a1a3a" },
   captionPromptHint: "Nostalgic, emotional, raw, honest, lowercase, short phrases",
 };

@@ -6,7 +6,7 @@ export const runtime = "edge";
 
 export async function POST(req: NextRequest) {
   try {
-    const { imageUrl, moodPackId, captionPromptHint } = await req.json();
+    const { imageUrl, moodPackId, captionPromptHint, locale } = await req.json();
 
     const openai = getOpenAIClient();
 
@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
           role: "system",
           content: `You generate short aesthetic captions for social media stories.
 Style: ${captionPromptHint}
+Language: ${locale === "vi" ? "Vietnamese" : "English"}
 Rules: 1-2 lines max. No hashtags. No emojis. Match the mood. Return ONLY the caption text.`,
         },
         {
