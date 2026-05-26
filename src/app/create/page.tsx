@@ -10,6 +10,7 @@ import { MOOD_PACKS, STORY_TYPE_CONFIGS, type StoryType } from "@/features/mood-
 import { useUpload, UploadZone, MediaPreview } from "@/features/upload";
 import { useUploadStore } from "@/store/uploadStore";
 import { useEditorStore } from "@/store/editorStore";
+import { useAIAnalysis } from "@/features/editor/hooks/useAIAnalysis";
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 
@@ -173,88 +174,91 @@ const AI_STEPS: AIStep[] = [
   { key: "caption", labelVi: "Tạo caption từ ảnh thật", labelEn: "Generating caption", duration: 600 },
 ];
 
-// MOCK AI result — dùng cho dev, sẽ thay bằng API call thật ở V2
-const MOCK_AI_RESULT = {
-  narrativeOrder: [0, 1, 2],
-  selectedSegments: [
-    { fileId: "mock-0", startTime: 0, endTime: 5, score: 0.92, reason: "Good composition" },
-    { fileId: "mock-1", startTime: 2, endTime: 7, score: 0.87, reason: "Nice lighting" },
-  ],
-  overallVibe: "Late night city, reflective mood",
-  suggestedDuration: 15 as const,
-  caption: "some nights feel heavier than they look",
-  suggestedMusicId: "nd-01",
-};
-
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
 function StepAIProcessing({ onDone }: { onDone: () => void }) {
   const { locale } = useI18n();
-  const setAIResult = useEditorStore((s) => s.setAIResult);
-  const setAIStatus = useEditorStore((s) => s.setAIStatus);
+  const files = useUploadStore((s) => s.files);
+  const selectedMoodPackId = useEditorStore((s) => s.selectedMoodPackId);
+  const storyType = useUploadStore((s) => s.storyType);
 
-  // currentStep: index đang chạy (-1 = chưa bắt đầu)
-  const [currentStep, setCurrentStep] = useState(-1);
-  const [doneSteps, setDoneSteps] = useState<Set<number>>(new Set());
+  const { analyze, status } = useAIAnalysis();
   const hasRun = useRef(false);
+
+  // Map AI status → step index để hiện UI
+  const stepIndexMap: Record<string, number> = {
+    analyzing: 0,
+    caption: 2, // step "Tạo caption"
+    music: 1, // step "Đồng bộ nhạc"
+    done: 3,
+  };
+
+  const [doneSteps, setDoneSteps] = useState<Set<number>>(new Set());
+  const currentStep = stepIndexMap[status] ?? -1;
+
+  // Đánh dấu step done khi status đổi
+  useEffect(() => {
+    if (status === "caption") setDoneSteps(new Set([0]));
+    if (status === "music") setDoneSteps(new Set([0, 2]));
+    if (status === "done") setDoneSteps(new Set([0, 1, 2, 3]));
+  }, [status]);
 
   useEffect(() => {
     if (hasRun.current) return;
     hasRun.current = true;
 
-    const run = async () => {
-      setAIStatus("loading");
+    if (!selectedMoodPackId || !storyType) return;
 
-      for (let i = 0; i < AI_STEPS.length; i++) {
-        setCurrentStep(i);
-        await sleep(AI_STEPS[i].duration);
-        setDoneSteps((prev) => new Set([...prev, i]));
-      }
+    analyze(files, selectedMoodPackId, storyType).then(() => {
+      setTimeout(onDone, 400);
+    });
+  }, [analyze, files, selectedMoodPackId, storyType, onDone]);
 
-      // Mock: set result vào store
-      setAIResult(MOCK_AI_RESULT);
-      setAIStatus("done");
+  // Error state
+  if (status === "error") {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4 px-4">
+        <span className="text-4xl">⚠️</span>
+        <p className="text-sm text-red-400 text-center">{locale === "vi" ? "AI phân tích thất bại. Thử lại nhé." : "AI analysis failed. Please try again."}</p>
+        <button
+          onClick={() => {
+            hasRun.current = false;
+            analyze(files, selectedMoodPackId!, storyType!);
+          }}
+          className="px-4 py-2 rounded-xl bg-[var(--brand-purple)] text-white text-sm"
+        >
+          {locale === "vi" ? "Thử lại" : "Retry"}
+        </button>
+      </div>
+    );
+  }
 
-      // Nhỏ delay rồi navigate
-      await sleep(400);
-      onDone();
-    };
-
-    run();
-  }, [onDone, setAIResult, setAIStatus]);
-
+  // UI giữ nguyên như cũ, chỉ dùng doneSteps/currentStep từ real status
   return (
     <div className="flex flex-col items-center justify-center h-full gap-8 px-4">
-      {/* Animated logo / spinner */}
       <div className="relative flex items-center justify-center">
-        {/* Outer ring */}
         <div className="absolute w-24 h-24 rounded-full border-2 border-[var(--brand-purple-border)] animate-spin" style={{ animationDuration: "3s", borderTopColor: "var(--brand-purple)" }} />
-        {/* Inner glow */}
         <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--brand-gradient)", boxShadow: "0 0 32px rgba(155,124,244,0.5)" }}>
           <SparkleIcon />
         </div>
       </div>
 
-      {/* Title */}
       <div className="text-center">
         <p className="text-lg font-bold text-[var(--text-primary)] mb-1">{locale === "vi" ? "AI đang xử lý..." : "AI is working..."}</p>
         <p className="text-xs text-[var(--text-muted)]">{locale === "vi" ? "Vài giây thôi, đừng tắt trang nhé" : "Just a few seconds, don't close the tab"}</p>
       </div>
 
-      {/* Step list */}
       <div className="w-full max-w-[280px] flex flex-col gap-3">
         {AI_STEPS.map((step, i) => {
           const isDone = doneSteps.has(i);
           const isActive = currentStep === i && !isDone;
-
           return (
             <div
               key={step.key}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-2xl",
-                "border transition-all duration-300",
+                "flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all duration-300",
                 isDone
                   ? "bg-[var(--brand-purple-dim)] border-[var(--brand-purple-border)]"
                   : isActive
@@ -262,7 +266,6 @@ function StepAIProcessing({ onDone }: { onDone: () => void }) {
                     : "bg-[var(--bg-card)] border-[var(--border-subtle)] opacity-40",
               )}
             >
-              {/* Status icon */}
               <div
                 className={cn(
                   "w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-300",
@@ -271,7 +274,6 @@ function StepAIProcessing({ onDone }: { onDone: () => void }) {
               >
                 {isDone ? <CheckIcon /> : isActive ? <span className="w-2 h-2 rounded-full bg-[var(--brand-purple)] animate-pulse" /> : null}
               </div>
-
               <p className={cn("text-sm transition-colors duration-300", isDone ? "text-[var(--text-primary)] font-medium" : isActive ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]")}>
                 {locale === "vi" ? step.labelVi : step.labelEn}
               </p>

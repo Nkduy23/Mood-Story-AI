@@ -2,18 +2,17 @@
 
 import { useCallback } from "react";
 import { useUploadStore } from "@/store/uploadStore";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import type { StoryType } from "@/features/mood-engine";
 
-// ── Constants ────────────────────────────────────────────────────────────────
-
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 const ALLOWED_TYPES: Record<string, boolean> = {
   "image/jpeg": true,
   "image/png": true,
   "image/webp": true,
   "video/mp4": true,
-  "video/quicktime": true, // .mov
+  "video/quicktime": true,
 };
 
 const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "mp4", "mov"];
@@ -24,12 +23,13 @@ const MAX_FILES_BY_TYPE: Record<StoryType, number> = {
   vibe: 3,
 };
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getMediaDimensions(file: File): Promise<{ width: number; height: number; duration?: number }> {
+function getMediaDimensions(file: File): Promise<{
+  width: number;
+  height: number;
+  duration?: number;
+}> {
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file);
-
     if (file.type.startsWith("video")) {
       const video = document.createElement("video");
       video.preload = "metadata";
@@ -57,25 +57,6 @@ function getMediaDimensions(file: File): Promise<{ width: number; height: number
   });
 }
 
-function simulateUploadProgress(id: string, updateFileProgress: (id: string, progress: number) => void): Promise<void> {
-  return new Promise((resolve) => {
-    let progress = 0;
-    const interval = setInterval(() => {
-      // Tăng nhanh lên 80%, rồi chậm lại
-      const increment = progress < 80 ? Math.random() * 20 + 10 : Math.random() * 8 + 2;
-      progress = Math.min(progress + increment, 99);
-      updateFileProgress(id, Math.floor(progress));
-
-      if (progress >= 99) {
-        clearInterval(interval);
-        setTimeout(() => resolve(), 150);
-      }
-    }, 120);
-  });
-}
-
-// ── Validate ─────────────────────────────────────────────────────────────────
-
 export interface ValidationError {
   file: string;
   reason: string;
@@ -87,32 +68,23 @@ function validateFiles(newFiles: File[], currentCount: number, maxFiles: number)
   const slotsLeft = maxFiles - currentCount;
 
   for (const file of newFiles) {
-    // Check slots
     if (valid.length >= slotsLeft) {
       errors.push({ file: file.name, reason: `Tối đa ${maxFiles} file` });
       continue;
     }
-
-    // Check type
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
     if (!ALLOWED_TYPES[file.type] && !ALLOWED_EXTENSIONS.includes(ext)) {
       errors.push({ file: file.name, reason: "Chỉ hỗ trợ JPG, PNG, WEBP, MP4, MOV" });
       continue;
     }
-
-    // Check size
     if (file.size > MAX_FILE_SIZE) {
       errors.push({ file: file.name, reason: "File tối đa 50MB" });
       continue;
     }
-
     valid.push(file);
   }
-
   return { valid, errors };
 }
-
-// ── Hook ─────────────────────────────────────────────────────────────────────
 
 export interface UseUploadReturn {
   files: ReturnType<typeof useUploadStore.getState>["files"];
@@ -141,34 +113,34 @@ export function useUpload(): UseUploadReturn {
       const { valid, errors } = validateFiles(newFiles, files.length, maxFiles);
       if (valid.length === 0) return errors;
 
-      // Thêm vào store trước (status: uploading, url: object URL)
       addFilesToStore(valid);
 
-      // Lấy IDs vừa được thêm (cuối store)
       const currentFiles = useUploadStore.getState().files;
       const newEntries = currentFiles.slice(currentFiles.length - valid.length);
 
-      // Process từng file song song
       await Promise.all(
         newEntries.map(async (entry, i) => {
           const file = valid[i];
-
           try {
-            // Chạy song song: get dimensions + simulate progress
-            const [dims] = await Promise.all([getMediaDimensions(file), simulateUploadProgress(entry.id, updateFileProgress)]);
+            // Chạy song song: get dimensions + upload Cloudinary thật
+            const [dims, cloudResult] = await Promise.all([
+              getMediaDimensions(file),
+              uploadToCloudinary(file, (progress) => {
+                updateFileProgress(entry.id, progress);
+              }),
+            ]);
 
-            // Mock: dùng object URL làm "Cloudinary URL"
             updateFile(entry.id, {
               width: dims.width,
               height: dims.height,
               duration: dims.duration,
               uploadProgress: 100,
               status: "done",
-              // Trong V2: thay bằng Cloudinary URL thật
-              url: entry.url, // giữ nguyên object URL
-              publicId: `mock-${entry.id}`,
+              url: cloudResult.secureUrl, // Cloudinary URL thật
+              publicId: cloudResult.publicId,
             });
-          } catch {
+          } catch (err) {
+            console.error("[Upload] failed:", err);
             updateFile(entry.id, {
               status: "error",
               error: "Upload thất bại, thử lại",
@@ -182,13 +154,5 @@ export function useUpload(): UseUploadReturn {
     [files.length, maxFiles, addFilesToStore, updateFileProgress, updateFile],
   );
 
-  return {
-    files,
-    storyType,
-    maxFiles,
-    canAddMore,
-    addFiles,
-    removeFile,
-    reorderFiles,
-  };
+  return { files, storyType, maxFiles, canAddMore, addFiles, removeFile, reorderFiles };
 }

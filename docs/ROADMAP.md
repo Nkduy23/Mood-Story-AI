@@ -71,39 +71,39 @@
 ### 1.4 Preview Page
 
 ```
-[ ] CanvasPreview component (Canvas render static preview, không phải video)
-[ ] Hiển thị color grade effect trên canvas
-[ ] Hiển thị text overlay với đúng font/style
-[ ] PlatformSelector (Instagram / TikTok / Facebook / Download)
-[ ] Export button
+[x] CanvasPreview component (Canvas render static preview, không phải video)
+[x] Hiển thị color grade effect trên canvas
+[x] Hiển thị text overlay với đúng font/style
+[x] PlatformSelector (Instagram / TikTok / Facebook / Download)
+[x] Export button
 ```
 
 ### 1.5 Export — Mock Render
 
 ```
-[ ] RenderProgress component (progress bar + estimated time)
-[ ] Mock render: sleep + increment progress → serve /public/mock/sample.mp4
-[ ] Download trigger (a[download] với blob URL)
-[ ] "Make another" → reset stores → về home
+[x] RenderProgress component (progress bar + estimated time)
+[x] Mock render: sleep + increment progress → serve /public/mock/sample.mp4
+[x] Download trigger (a[download] với blob URL)
+[x] "Make another" → reset stores → về home
 ```
 
 ### 1.6 Mood Engine — Data Layer
 
 ```
-[ ] Types: MoodPack, MoodSeed, ResolvedPackParams, StoryType
-[ ] 6 Mood Pack definitions (night-drive, chill, sad, coding, cinematic, neon)
-[ ] generateSeed() function
-[ ] resolveSeed() function
-[ ] getMoodPack() helper
-[ ] Beat markers data cho từng track
+[x] Types: MoodPack, MoodSeed, ResolvedPackParams, StoryType
+[x] 6 Mood Pack definitions (night-drive, chill, sad, coding, cinematic, neon)
+[x] generateSeed() function
+[x] resolveSeed() function
+[x] getMoodPack() helper
+[x] Beat markers data cho từng track
 ```
 
 ### 1.7 Zustand Stores
 
 ```
-[ ] uploadStore (theo STATE_MANAGEMENT.md)
-[ ] editorStore (theo STATE_MANAGEMENT.md)
-[ ] exportStore (theo STATE_MANAGEMENT.md)
+[x] uploadStore (theo STATE_MANAGEMENT.md)
+[x] editorStore (theo STATE_MANAGEMENT.md)
+[x] exportStore (theo STATE_MANAGEMENT.md)
 ```
 
 ---
@@ -111,21 +111,21 @@
 ## V1.5 — Real Video Engine (FE vẫn, nhưng render thật)
 
 ```
-[ ] FFmpeg singleton setup (lib/ffmpeg.ts)
-[ ] next.config.ts: COOP/COEP headers
-[ ] Canvas Compositor: Ken Burns effect
-[ ] Canvas Compositor: color grade (brightness/contrast/saturation)
-[ ] Canvas Compositor: text overlay với typewriter animation
-[ ] Canvas Compositor: transition (slow-fade trước)
-[ ] Thêm transition: light-leak, film-burn
-[ ] FFmpeg encode: PNG sequence → MP4
-[ ] FFmpeg: ghép audio track vào MP4
-[ ] Test render 10s video thật
-[ ] Test render 25s video thật
-[ ] Progress bar real (từ FFmpeg progress event)
-[ ] Error handling: FFmpeg load fail, render fail
-[ ] Thêm sample music vào /public/music/ (3-5 tracks free license)
-[ ] Audio preview trong MusicSelector (HTMLAudioElement)
+[x] FFmpeg singleton setup (lib/ffmpeg.ts)
+[x] next.config.ts: COOP/COEP headers
+[x] Canvas Compositor: Ken Burns effect
+[x] Canvas Compositor: color grade (brightness/contrast/saturation)
+[x] Canvas Compositor: text overlay với typewriter animation
+[x] Canvas Compositor: transition (slow-fade trước)
+[x] Thêm transition: light-leak, film-burn
+[x] FFmpeg encode: PNG sequence → MP4
+[x] FFmpeg: ghép audio track vào MP4
+[x] Test render 10s video thật
+[x] Test render 25s video thật
+[x] Progress bar real (từ FFmpeg progress event)
+[x] Error handling: FFmpeg load fail, render fail
+[x] Thêm sample music vào /public/music/ (3-5 tracks free license)
+[x] Audio preview trong MusicSelector (HTMLAudioElement)
 ```
 
 ---

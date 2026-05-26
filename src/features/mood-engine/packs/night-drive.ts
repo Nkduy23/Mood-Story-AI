@@ -20,8 +20,15 @@ export const nightDrive: MoodPack = {
   ],
   animationSpeeds: [0.8, 1.0],
   musicPool: [
-    { id: "nd-01", filename: "night-drive-lofi-01.mp3", name: "Midnight Drive", bpm: 85, duration: 180, mood: ["night-drive"], beatMarkers: [8, 16, 24] },
-    { id: "nd-02", filename: "night-drive-lofi-02.mp3", name: "3AM City", bpm: 78, duration: 200, mood: ["night-drive"], beatMarkers: [10, 20, 30] },
+    {
+      id: "nd-01",
+      filename: "night-drive-01.mp3",
+      name: "Midnight Drive",
+      bpm: 85,
+      duration: 180,
+      mood: ["night-drive"],
+      beatMarkers: [8, 16, 24],
+    },
   ],
   colorTone: { shadows: "#0a1628", highlights: "#f5e6d0", midtones: "#1a3a5c" },
   captionPromptHint: "Melancholic, late night, introspective, poetic, lowercase, no punctuation",
