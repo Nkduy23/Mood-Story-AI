@@ -141,7 +141,7 @@ async function createMockBlob(setProgress: (n: number) => void, setStage: (s: Re
   }
 
   mark("total ✓");
-  const blob = new Blob([raw], { type: "video/mp4" });
+  const blob = new Blob([raw.slice().buffer], { type: "video/mp4" });
   return { blob, url: URL.createObjectURL(blob) };
 }
 
@@ -275,7 +275,7 @@ export function useFFmpegRender(): UseFFmpegRenderReturn {
       setProgress(95);
 
       const raw = (await ffmpeg.readFile("output.mp4")) as Uint8Array;
-      const blob = new Blob([raw], { type: "video/mp4" });
+      const blob = new Blob([raw.slice().buffer], { type: "video/mp4" });
       const url = URL.createObjectURL(blob);
 
       for (let i = 0; i < totalFrames; i++) {

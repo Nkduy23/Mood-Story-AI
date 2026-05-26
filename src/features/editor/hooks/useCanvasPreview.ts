@@ -17,7 +17,7 @@ interface UseCanvasPreviewOptions {
 }
 
 interface UseCanvasPreviewReturn {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   isReady: boolean;
   isLoading: boolean;
   error: string | null;
