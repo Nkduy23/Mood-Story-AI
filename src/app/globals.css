@@ -20,7 +20,7 @@
 
   /* Text */
   --text-primary: #f0eeff;
-  --text-secondary: rgba(240, 238, 255, 0.55);
+  --text-secondary: rgba(22, 22, 23, 0.55);
   --text-muted: rgba(240, 238, 255, 0.28);
 
   /* Borders */
@@ -227,8 +227,8 @@ html {
   --bg-base: #f5f4ff;
   --bg-card: #ffffff;
   --bg-elevated: #ede9fe;
-  --text-primary: #1a1730;
-  --text-secondary: rgba(26,23,48,0.6);
+  --text-primary: #171718;
+  --text-secondary: rgba(2, 2, 2, 0.6);
   --text-muted: rgba(26,23,48,0.35);
   --border-subtle: rgba(0,0,0,0.07);
   --border-card: rgba(0,0,0,0.1);

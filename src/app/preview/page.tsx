@@ -10,7 +10,8 @@ import { useEditorStore } from "@/store/editorStore";
 import { useUploadStore } from "@/store/uploadStore";
 import { getMoodPack } from "@/features/mood-engine";
 import { useCanvasPreview } from "@/features/editor/hooks/useCanvasPreview";
-import { useFFmpegRender } from "@/features/export/hooks/useFFmpegRender";
+// import { useFFmpegRender } from "@/features/export/hooks/useFFmpegRender";
+import { useServerRender as useFFmpegRender } from "@/features/export/hooks/useServerRender";
 
 const RENDER_TIPS_VI = [
   "AI đã chọn khoảnh khắc đẹp nhất trong ảnh của bạn ✨",
